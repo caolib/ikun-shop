@@ -1,12 +1,12 @@
 server:
-  port: 9000
+  port: 9100
 spring:
   application:
     name: commodity
   profiles:
     active: local
   datasource:
-    url: jdbc:mysql://${hm.db.host}:3306/commodity?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${hm.db.host}:3306/cart?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${hm.db.pw}
@@ -31,7 +31,7 @@ knife4j:
   enable: true
   openapi:
     title: ikun-shop API
-    description: "ikun shop 商品接口文档"
+    description: "ikun shop购物车接口文档"
     email: 1265501579@qq.com
     concat: caolib
     url: https://github.com/caolib
