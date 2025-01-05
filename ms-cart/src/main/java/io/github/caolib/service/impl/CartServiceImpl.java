@@ -4,7 +4,9 @@ package io.github.caolib.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.caolib.client.CommodityClient;
 import io.github.caolib.domain.dto.CartFormDTO;
+import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.po.Cart;
 import io.github.caolib.domain.vo.CartVO;
 import io.github.caolib.exception.BizIllegalException;
@@ -18,6 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -30,8 +36,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
-
-    //private final ICommodityService itemService;
+    private final CommodityClient commodityClient;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -75,25 +80,24 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     }
 
     private void handleCartItems(List<CartVO> vos) {
-        // TODO 1.获取商品id
-        //Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
-        //// 2.查询商品
-        //List<CommodityDTO> items = itemService.queryItemByIds(itemIds);
-        //if (CollUtils.isEmpty(items)) {
-        //    return;
-        //}
-        //// 3.转为 id 到 item的map
-        //Map<Long, CommodityDTO> itemMap = items.stream().collect(Collectors.toMap(CommodityDTO::getId, Function.identity()));
-        //// 4.写入vo
-        //for (CartVO v : vos) {
-        //    CommodityDTO item = itemMap.get(v.getItemId());
-        //    if (item == null) {
-        //        continue;
-        //    }
-        //    v.setNewPrice(item.getPrice());
-        //    v.setStatus(item.getStatus());
-        //    v.setStock(item.getStock());
-        //}
+        // 1.获取商品id
+        Set<Long> CommodityIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
+
+        // 2.查询商品
+        List<CommodityDTO> commodityDTOS = commodityClient.queryCommodityByIds(CommodityIds);
+        if (CollUtils.isEmpty(commodityDTOS)) return;// 无商品直接返回
+
+        // 3.转为 id 到 item的map
+        Map<Long, CommodityDTO> itemMap = commodityDTOS.stream().collect(Collectors.toMap(CommodityDTO::getId, Function.identity()));
+        // 4.写入vo
+        for (CartVO v : vos) {
+            CommodityDTO item = itemMap.get(v.getItemId());
+            if (item == null)
+                continue;
+            v.setNewPrice(item.getPrice());
+            v.setStatus(item.getStatus());
+            v.setStock(item.getStock());
+        }
     }
 
     @Override

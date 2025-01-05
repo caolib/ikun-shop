@@ -12,6 +12,7 @@ spring:
     password: ${database.password}
   main:
     banner-mode: off
+
 # mp
 mybatis-plus:
   configuration:

@@ -12,6 +12,7 @@ spring:
     password: ${database.password}
   main:
     banner-mode: off
+
 mybatis-plus:
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler

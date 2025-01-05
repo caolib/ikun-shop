@@ -3,8 +3,10 @@ package io.github.caolib;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
+@EnableFeignClients
 @MapperScan(basePackages = "io.github.caolib.mapper")
 @SpringBootApplication
 public class CartApp {

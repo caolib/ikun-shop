@@ -1,6 +1,6 @@
 database:
+  host: centos
   username: root
-  host: mysql
   password: root
 
 nacos:

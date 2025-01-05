@@ -2,3 +2,5 @@ spring:
   cloud:
     nacos:
       server-addr: ${nacos.addr}
+  application:
+    name: commodity
