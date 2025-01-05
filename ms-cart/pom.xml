@@ -18,17 +18,13 @@
     </properties>
 
     <dependencies>
-        <!--openfeign-->
+        <!--openfign-api-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <groupId>io.github.caolib</groupId>
+            <artifactId>feign-api</artifactId>
+            <version>1.0.0</version>
         </dependency>
-        <!--负载均衡器-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-        <!--公共依赖-->
+        <!--工具依赖-->
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>utils</artifactId>

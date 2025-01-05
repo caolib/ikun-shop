@@ -43,3 +43,7 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - io.github.caolib.controller
+# okhttp 连接池
+feign:
+  okhttp:
+    enabled: true
