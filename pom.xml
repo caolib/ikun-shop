@@ -21,6 +21,7 @@
         <module>utils</module>
         <module>ms-commodity</module>
         <module>ms-cart</module>
+        <module>feign-api</module>
     </modules>
 
     <!-- 版本等配置 -->

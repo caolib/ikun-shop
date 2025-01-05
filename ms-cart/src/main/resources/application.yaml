@@ -2,16 +2,17 @@ server:
   port: 9100
 spring:
   application:
-    name: commodity
+    name: cart
   profiles:
-    active: local
+    active: dev
   datasource:
-    url: jdbc:mysql://${hm.db.host}:3306/cart?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${database.host}:3306/${spring.application.name}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: ${hm.db.pw}
+    username: ${database.username}
+    password: ${database.password}
   main:
     banner-mode: off
+
 mybatis-plus:
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
@@ -42,3 +43,7 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - io.github.caolib.controller
+# okhttp 连接池
+feign:
+  okhttp:
+    enabled: true

@@ -1,4 +1,7 @@
-hm:
-  db:
-    host: mysql
-    pw: root
+database:
+  host: localhost
+  username: root
+  password: root
+
+nacos:
+  addr: localhost:8848

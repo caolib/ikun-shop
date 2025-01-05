@@ -18,7 +18,13 @@
     </properties>
 
     <dependencies>
-        <!--公共依赖-->
+        <!--openfign-api-->
+        <dependency>
+            <groupId>io.github.caolib</groupId>
+            <artifactId>feign-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!--工具依赖-->
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>utils</artifactId>
