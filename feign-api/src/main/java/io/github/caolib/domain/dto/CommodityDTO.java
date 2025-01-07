@@ -1,4 +1,4 @@
-package io.github.caolib.dto;
+package io.github.caolib.domain.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
