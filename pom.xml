@@ -22,6 +22,9 @@
         <module>ms-commodity</module>
         <module>ms-cart</module>
         <module>feign-api</module>
+        <module>ms-user</module>
+        <module>ms-order</module>
+        <module>ms-pay</module>
     </modules>
 
     <!-- 版本等配置 -->

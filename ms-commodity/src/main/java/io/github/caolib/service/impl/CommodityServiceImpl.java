@@ -21,7 +21,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     @Override
     public void deductStock(List<OrderDetailDTO> items) {
         // TODO 不使用字符串拼接
-        String sqlStatement = "io.github.caolib.io.github.caolib.mapper.CommodityMapper.updateStock";
+        String sqlStatement = "io.github.caolib.mapper.CommodityMapper.updateStock";
         boolean r;
         try {
             r = executeBatch(items, (sqlSession, entity) -> sqlSession.update(sqlStatement, entity));

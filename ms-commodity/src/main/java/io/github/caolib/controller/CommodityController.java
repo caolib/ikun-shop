@@ -22,13 +22,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommodityController {
 
-    private final ICommodityService itemService;
+    private final ICommodityService commodityService;
 
     @ApiOperation("分页查询商品")
     @GetMapping("/page")
     public PageDTO<CommodityDTO> queryItemByPage(PageQuery query) {
         // 1.分页查询
-        Page<Commodity> result = itemService.page(query.toMpPage("update_time", false));
+        Page<Commodity> result = commodityService.page(query.toMpPage("update_time", false));
         // 2.封装并返回
         return PageDTO.of(result, CommodityDTO.class);
     }
@@ -36,20 +36,20 @@ public class CommodityController {
     @ApiOperation("根据id批量查询商品")
     @GetMapping
     public List<CommodityDTO> queryItemByIds(@RequestParam("ids") List<Long> ids) {
-        return itemService.queryItemByIds(ids);
+        return commodityService.queryItemByIds(ids);
     }
 
     @ApiOperation("根据id查询商品")
     @GetMapping("{id}")
     public CommodityDTO queryItemById(@PathVariable("id") Long id) {
-        return BeanUtils.copyBean(itemService.getById(id), CommodityDTO.class);
+        return BeanUtils.copyBean(commodityService.getById(id), CommodityDTO.class);
     }
 
     @ApiOperation("新增商品")
     @PostMapping
     public void saveItem(@RequestBody CommodityDTO item) {
         // 新增
-        itemService.save(BeanUtils.copyBean(item, Commodity.class));
+        commodityService.save(BeanUtils.copyBean(item, Commodity.class));
     }
 
     @ApiOperation("更新商品状态")
@@ -58,7 +58,7 @@ public class CommodityController {
         Commodity item = new Commodity();
         item.setId(id);
         item.setStatus(status);
-        itemService.updateById(item);
+        commodityService.updateById(item);
     }
 
     @ApiOperation("更新商品")
@@ -67,18 +67,18 @@ public class CommodityController {
         // 不允许修改商品状态，所以强制设置为null，更新时，就会忽略该字段
         item.setStatus(null);
         // 更新
-        itemService.updateById(BeanUtils.copyBean(item, Commodity.class));
+        commodityService.updateById(BeanUtils.copyBean(item, Commodity.class));
     }
 
     @ApiOperation("根据id删除商品")
     @DeleteMapping("{id}")
     public void deleteItemById(@PathVariable("id") Long id) {
-        itemService.removeById(id);
+        commodityService.removeById(id);
     }
 
     @ApiOperation("批量扣减库存")
     @PutMapping("/stock/deduct")
     public void deductStock(@RequestBody List<OrderDetailDTO> items) {
-        itemService.deductStock(items);
+        commodityService.deductStock(items);
     }
 }
