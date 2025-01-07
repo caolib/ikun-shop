@@ -25,6 +25,7 @@
         <module>ms-user</module>
         <module>ms-order</module>
         <module>ms-pay</module>
+        <module>gateway</module>
     </modules>
 
     <!-- 版本等配置 -->

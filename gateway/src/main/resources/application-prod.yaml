@@ -1,0 +1,3 @@
+
+nacos:
+  addr: centos:8848

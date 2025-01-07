@@ -1,0 +1,33 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: dev
+  main:
+    banner-mode: off
+  cloud:
+    gateway:
+      # 路由规则
+      routes:
+        - id: cart
+          uri: lb://cart
+          predicates:
+            - Path=/carts/**
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/orders/**
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/users/**,/addresses/**
+        - id: commodity
+          uri: lb://commodity
+          predicates:
+            - Path=/commodities/**,/search/**
+        - id: pay
+          uri: lb://pay
+          predicates:
+            - Path=/pays/**
