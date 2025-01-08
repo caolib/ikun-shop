@@ -23,6 +23,8 @@ spring:
           uri: lb://user
           predicates:
             - Path=/users/**,/addresses/**
+          filters:
+            - AddRequestHeader=X-Request-red, blue
         - id: commodity
           uri: lb://commodity
           predicates:
@@ -31,3 +33,27 @@ spring:
           uri: lb://pay
           predicates:
             - Path=/pays/**
+      default-filters:
+        - AddRequestHeader=X-Request-red, blue
+# 日志
+logging:
+  level:
+    io.github.caolib: debug
+  pattern:
+    dateformat: HH:mm:ss:SSS
+  file:
+    path: "logs/${spring.application.name}"
+
+# 校验信息
+shop:
+  jwt:
+    location: classpath:key.jks
+    alias: ikun
+    password: ikun-shop-123456
+    tokenTTL: 30m
+  auth:
+    excludePaths:
+      - /search/**
+      - /users/login
+      - /items/**
+      - /hi
