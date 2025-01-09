@@ -1,7 +1,6 @@
 database:
+  name: trade
   host: localhost
+  port: 3306
   username: root
   password: root
-
-nacos:
-  addr: localhost:8848

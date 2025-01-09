@@ -1,12 +1,6 @@
 server:
   port: 8080
 spring:
-  application:
-    name: gateway
-  profiles:
-    active: dev
-  main:
-    banner-mode: off
   cloud:
     gateway:
       # 路由规则
@@ -35,14 +29,6 @@ spring:
             - Path=/pays/**
       default-filters:
         - AddRequestHeader=X-Request-red, blue
-# 日志
-logging:
-  level:
-    io.github.caolib: debug
-  pattern:
-    dateformat: HH:mm:ss:SSS
-  file:
-    path: "logs/${spring.application.name}"
 
 # 校验信息
 shop:

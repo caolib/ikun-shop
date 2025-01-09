@@ -1,7 +1,6 @@
 database:
+  name: commodity
   host: localhost
   username: root
   password: root
 
-nacos:
-  addr: localhost:8848

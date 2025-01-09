@@ -1,7 +1,5 @@
 database:
+  name: user
   host: localhost
   username: root
   password: root
-
-nacos:
-  addr: localhost:8848
