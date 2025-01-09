@@ -13,3 +13,4 @@ spring:
           - data-id: logs.yaml
           - data-id: swagger.yaml
           - data-id: openfeign.yaml
+          - data-id: sentinel.yaml
