@@ -1,7 +1,9 @@
+# 数据源配置
 database:
+  name: cart
   host: localhost
+  port: 3306
   username: root
   password: root
-
-nacos:
-  addr: localhost:8848
+cart:
+  max-commodity-num: 3

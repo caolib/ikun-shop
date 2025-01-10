@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CommodityClient;
+import io.github.caolib.config.CartProperties;
 import io.github.caolib.domain.dto.CartFormDTO;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.po.Cart;
@@ -25,18 +26,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * <p>
- * 订单详情表 服务实现类
- * </p>
- *
- * @author 虎哥
- * @since 2023-05-05
- */
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
     private final CommodityClient commodityClient;
+    private final CartProperties cartProperties;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -63,8 +57,8 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
     @Override
     public List<CartVO> queryMyCarts() {
-        //todo 1.查询我的购物车列表
-        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, 1L /*UserContext.getUser()*/).list();
+        // 1.查询我的购物车列表
+        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUser()).list();
         if (CollUtils.isEmpty(carts)) {
             return CollUtils.emptyList();
         }
@@ -111,10 +105,14 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         remove(queryWrapper);
     }
 
+    /**
+     * 检查购物车是否已满
+     */
     private void checkCartsFull(Long userId) {
         long count = lambdaQuery().eq(Cart::getUserId, userId).count();
-        if (count >= 10) {
-            throw new BizIllegalException(StrUtil.format("用户购物车课程不能超过{}", 10));
+        int max = cartProperties.getMaxCommodityNum(); // 购物车中商品数量上限
+        if (count >= max) {
+            throw new BizIllegalException(StrUtil.format("用户购物车课程不能超过{}", max));
         }
     }
 

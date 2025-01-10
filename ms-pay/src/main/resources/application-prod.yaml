@@ -1,7 +1,0 @@
-database:
-  username: root
-  host: mysql
-  password: root
-
-nacos:
-  addr: centos:8848

@@ -1,6 +1,12 @@
 spring:
-  cloud:
-    nacos:
-      server-addr: ${nacos.addr}
   application:
     name: gateway
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      config:
+        extension-configs: yaml
+        shared-configs:
+          - data-id: logs.yaml

@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.caolib.config.MyBatisConfig,\
-  io.github.caolib.config.JsonConfig

@@ -1,12 +1,6 @@
 server:
   port: 8080
 spring:
-  application:
-    name: gateway
-  profiles:
-    active: dev
-  main:
-    banner-mode: off
   cloud:
     gateway:
       # 路由规则
@@ -23,6 +17,8 @@ spring:
           uri: lb://user
           predicates:
             - Path=/users/**,/addresses/**
+          filters:
+            - AddRequestHeader=X-Request-red, blue
         - id: commodity
           uri: lb://commodity
           predicates:
@@ -31,3 +27,19 @@ spring:
           uri: lb://pay
           predicates:
             - Path=/pays/**
+      default-filters:
+        - AddRequestHeader=X-Request-red, blue
+
+# 校验信息
+shop:
+  jwt:
+    location: classpath:key.jks
+    alias: ikun
+    password: ikun-shop-123456
+    tokenTTL: 30m
+  auth:
+    excludePaths:
+      - /search/**
+      - /users/login
+      - /items/**
+      - /hi

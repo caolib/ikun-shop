@@ -1,7 +1,0 @@
-database:
-  host: centos
-  username: root
-  password: root
-
-nacos:
-  addr: centos:8848

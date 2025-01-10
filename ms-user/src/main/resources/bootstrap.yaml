@@ -1,6 +1,16 @@
 spring:
-  cloud:
-    nacos:
-      server-addr: ${nacos.addr}
   application:
     name: user
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      config:
+        extension-configs: yaml
+        shared-configs:
+          - data-id: datasource.yaml
+          - data-id: logs.yaml
+          - data-id: swagger.yaml
+          - data-id: openfeign.yaml
+          - data-id: sentinel.yaml
