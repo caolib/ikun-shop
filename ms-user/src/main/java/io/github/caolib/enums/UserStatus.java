@@ -19,12 +19,10 @@ public enum UserStatus {
     }
 
     public static UserStatus of(int value) {
-        if (value == 0) {
+        if (value == 0)
             return FROZEN;
-        }
-        if (value == 1) {
+        if (value == 1)
             return NORMAL;
-        }
         throw new BadRequestException("账户状态错误");
     }
 }

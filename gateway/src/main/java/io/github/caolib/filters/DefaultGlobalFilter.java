@@ -15,7 +15,7 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        //log.debug("request path: {}", request.getPath());
+        log.debug("请求路径: {}", request.getPath());
         //log.debug("request headers: {}", request.getHeaders());
         //log.debug("Authorization: {}", request.getHeaders().get("Authorization"));
 
