@@ -57,6 +57,11 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <!--服务状态-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>

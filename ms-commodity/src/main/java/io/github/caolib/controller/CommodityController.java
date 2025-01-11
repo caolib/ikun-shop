@@ -1,6 +1,5 @@
 package io.github.caolib.controller;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.caolib.domain.PageDTO;
 import io.github.caolib.domain.PageQuery;
@@ -9,14 +8,14 @@ import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.po.Commodity;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = "商品管理相关接口")
+/**
+ * 商品管理相关接口
+ */
 @RestController
 @RequestMapping("/commodity")
 @RequiredArgsConstructor
@@ -24,7 +23,11 @@ public class CommodityController {
 
     private final ICommodityService commodityService;
 
-    @ApiOperation("分页查询商品")
+    /**
+     * 分页查询商品
+     * @param query 分页查询条件
+     * @return 分页结果
+     */
     @GetMapping("/page")
     public PageDTO<CommodityDTO> queryItemByPage(PageQuery query) {
         // 1.分页查询
@@ -33,26 +36,41 @@ public class CommodityController {
         return PageDTO.of(result, CommodityDTO.class);
     }
 
-    @ApiOperation("根据id批量查询商品")
+    /**
+     * 根据id批量查询商品
+     * @param ids 商品id集合
+     * @return 商品列表
+     */
     @GetMapping
     public List<CommodityDTO> queryItemByIds(@RequestParam("ids") List<Long> ids) {
         return commodityService.queryItemByIds(ids);
     }
 
-    @ApiOperation("根据id查询商品")
+    /**
+     * 根据id查询商品
+     * @param id 商品id
+     * @return 商品信息
+     */
     @GetMapping("{id}")
     public CommodityDTO queryItemById(@PathVariable("id") Long id) {
         return BeanUtils.copyBean(commodityService.getById(id), CommodityDTO.class);
     }
 
-    @ApiOperation("新增商品")
+    /**
+     * 新增商品
+     * @param item 商品信息
+     */
     @PostMapping
     public void saveItem(@RequestBody CommodityDTO item) {
         // 新增
         commodityService.save(BeanUtils.copyBean(item, Commodity.class));
     }
 
-    @ApiOperation("更新商品状态")
+    /**
+     * 更新商品状态
+     * @param id 商品id
+     * @param status 商品状态
+     */
     @PutMapping("/status/{id}/{status}")
     public void updateItemStatus(@PathVariable("id") Long id, @PathVariable("status") Integer status) {
         Commodity item = new Commodity();
@@ -61,7 +79,10 @@ public class CommodityController {
         commodityService.updateById(item);
     }
 
-    @ApiOperation("更新商品")
+    /**
+     * 更新商品
+     * @param item 商品信息
+     */
     @PutMapping
     public void updateItem(@RequestBody CommodityDTO item) {
         // 不允许修改商品状态，所以强制设置为null，更新时，就会忽略该字段
@@ -70,13 +91,19 @@ public class CommodityController {
         commodityService.updateById(BeanUtils.copyBean(item, Commodity.class));
     }
 
-    @ApiOperation("根据id删除商品")
+    /**
+     * 根据id删除商品
+     * @param id 商品id
+     */
     @DeleteMapping("{id}")
     public void deleteItemById(@PathVariable("id") Long id) {
         commodityService.removeById(id);
     }
 
-    @ApiOperation("批量扣减库存")
+    /**
+     * 批量扣减库存
+     * @param items 订单详情列表
+     */
     @PutMapping("/stock/deduct")
     public void deductStock(@RequestBody List<OrderDetailDTO> items) {
         commodityService.deductStock(items);

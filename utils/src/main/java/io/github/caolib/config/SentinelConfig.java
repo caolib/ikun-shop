@@ -24,8 +24,8 @@ public class SentinelConfig implements BlockExceptionHandler {
      */
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, BlockException e) throws Exception {
-        log.error(E.FLOW_LIMIT);
-        httpServletResponse.setStatus(429); // FIXME:状态码返回待修复
+        log.error(E.FLOW_LIMIT, e);
+        httpServletResponse.setStatus(429);
         R<Object> error = R.error(429, E.FLOW_LIMIT);
         httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.getWriter().write(JSON.toJSONString(error));
