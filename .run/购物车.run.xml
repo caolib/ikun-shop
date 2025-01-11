@@ -3,7 +3,7 @@
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="ms-cart" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.CartApp" />
-    <option name="VM_PARAMETERS" value="-Dserver.port=9100" />
+    <option name="VM_PARAMETERS" value="-Dserver.port=9105" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.caolib.*" />

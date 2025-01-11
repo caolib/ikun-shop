@@ -1,6 +1,5 @@
 package io.github.caolib.controller;
 
-
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.caolib.domain.PageDTO;
@@ -8,14 +7,14 @@ import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.po.Commodity;
 import io.github.caolib.domain.query.CommodityPageQuery;
 import io.github.caolib.service.ICommodityService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "搜索相关接口")
+/**
+ * 搜索相关接口
+ */
 @RestController
 @RequestMapping("/search")
 @RequiredArgsConstructor
@@ -23,7 +22,11 @@ public class SearchController {
 
     private final ICommodityService itemService;
 
-    @ApiOperation("搜索商品")
+    /**
+     * 搜索商品
+     * @param query 商品分页查询条件
+     * @return 分页结果
+     */
     @GetMapping("/list")
     public PageDTO<CommodityDTO> search(CommodityPageQuery query) {
         // 分页查询

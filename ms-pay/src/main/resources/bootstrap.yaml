@@ -11,6 +11,5 @@ spring:
         shared-configs:
           - data-id: datasource.yaml
           - data-id: logs.yaml
-          - data-id: swagger.yaml
           - data-id: openfeign.yaml
           - data-id: sentinel.yaml

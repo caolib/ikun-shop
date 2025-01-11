@@ -24,11 +24,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
-
     private final PasswordEncoder passwordEncoder;
-
     private final JwtTool jwtTool;
-
     private final JwtProperties jwtProperties;
 
     @Override

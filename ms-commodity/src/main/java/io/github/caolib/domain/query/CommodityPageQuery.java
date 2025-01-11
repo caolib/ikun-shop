@@ -1,23 +1,33 @@
 package io.github.caolib.domain.query;
 
 import io.github.caolib.domain.PageQuery;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 商品分页查询条件
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(description = "商品分页查询条件")
 public class CommodityPageQuery extends PageQuery {
-    @ApiModelProperty("搜索关键字")
+    /**
+     * 搜索关键字
+     */
     private String key;
-    @ApiModelProperty("商品分类")
+    /**
+     * 商品分类
+     */
     private String category;
-    @ApiModelProperty("商品品牌")
+    /**
+     * 商品品牌
+     */
     private String brand;
-    @ApiModelProperty("价格最小值")
+    /**
+     * 价格最小值
+     */
     private Integer minPrice;
-    @ApiModelProperty("价格最大值")
+    /**
+     * 价格最大值
+     */
     private Integer maxPrice;
 }

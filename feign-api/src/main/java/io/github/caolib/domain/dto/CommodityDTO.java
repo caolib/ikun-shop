@@ -1,34 +1,69 @@
 package io.github.caolib.domain.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+/**
+ * 商品数据传输对象
+ */
 @Data
-@ApiModel(description = "商品实体")
 public class CommodityDTO {
-    @ApiModelProperty("商品id")
+    /**
+     * 商品ID
+     */
     private Long id;
-    @ApiModelProperty("SKU名称")
+
+    /**
+     * 商品名称
+     */
     private String name;
-    @ApiModelProperty("价格（分）")
+
+    /**
+     * 价格（分）
+     */
     private Integer price;
-    @ApiModelProperty("库存数量")
+
+    /**
+     * 库存数量
+     */
     private Integer stock;
-    @ApiModelProperty("商品图片")
+
+    /**
+     * 商品图片
+     */
     private String image;
-    @ApiModelProperty("类目名称")
+
+    /**
+     * 类目名称
+     */
     private String category;
-    @ApiModelProperty("品牌名称")
+
+    /**
+     * 品牌名称
+     */
     private String brand;
-    @ApiModelProperty("规格")
+
+    /**
+     * 规格
+     */
     private String spec;
-    @ApiModelProperty("销量")
+
+    /**
+     * 销量
+     */
     private Integer sold;
-    @ApiModelProperty("评论数")
+
+    /**
+     * 评论数
+     */
     private Integer commentCount;
-    @ApiModelProperty("是否是推广广告，true/false")
+
+    /**
+     * 是否是推广广告，true/false
+     */
     private Boolean isAD;
-    @ApiModelProperty("商品状态 1-正常，2-下架，3-删除")
+
+    /**
+     * 商品状态 1-正常，2-下架，3-删除
+     */
     private Integer status;
 }
