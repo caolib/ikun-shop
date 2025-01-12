@@ -1,6 +1,7 @@
 package io.github.caolib.client;
 
 
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -18,5 +19,5 @@ public interface CommodityClient {
     List<CommodityDTO> queryCommodityByIds(@RequestParam("ids") Collection<Long> ids);
 
     @PutMapping("/stock/deduct")
-    void deductStock(@RequestBody List<OrderDetailDTO> items);
+    R<Void> deductStock(@RequestBody List<OrderDetailDTO> items);
 }

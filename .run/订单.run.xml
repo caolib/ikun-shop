@@ -3,6 +3,7 @@
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="ms-order" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.OrderApp" />
+    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.caolib.*" />

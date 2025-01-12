@@ -29,6 +29,8 @@ spring:
             - Path=/pays/**
       default-filters:
         - AddRequestHeader=X-Request-red, blue
+  main:
+    banner-mode: off
 
 # 校验信息
 shop:

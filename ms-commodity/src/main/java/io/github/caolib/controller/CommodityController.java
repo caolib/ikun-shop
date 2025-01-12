@@ -3,6 +3,7 @@ package io.github.caolib.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.caolib.domain.PageDTO;
 import io.github.caolib.domain.PageQuery;
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.po.Commodity;
@@ -105,7 +106,7 @@ public class CommodityController {
      * @param items 订单详情列表
      */
     @PutMapping("/stock/deduct")
-    public void deductStock(@RequestBody List<OrderDetailDTO> items) {
-        commodityService.deductStock(items);
+    public R<Void> deductStock(@RequestBody List<OrderDetailDTO> items) {
+       return commodityService.deductStock(items);
     }
 }

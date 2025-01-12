@@ -15,7 +15,7 @@ public class R<T> {
     }
 
     public static <T> R<T> ok(T data) {
-        return new R<>(200, "OK", data);
+        return new R<>(200, "成功", data);
     }
 
     public static <T> R<T> error(String msg) {
@@ -41,5 +41,14 @@ public class R<T> {
 
     public boolean success(){
         return code == 200;
+    }
+
+    @Override
+    public String toString() {
+        return "R{" +
+                "code=" + code +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
     }
 }

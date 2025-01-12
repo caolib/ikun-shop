@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.NestedServletException;
 
 import java.net.BindException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -44,7 +45,7 @@ public class CommonExceptionAdvice {
     }
     @ExceptionHandler(BindException.class)
     public Object handleBindException(BindException e) {
-        log.error("请求参数绑定异常 ->BindException， {}", e.getMessage());
+        log.error("请求参数绑定异常 -> BindException， {}", e.getMessage());
         log.debug("", e);
         return processResponse(new BadRequestException("请求参数格式错误"));
     }
@@ -58,7 +59,7 @@ public class CommonExceptionAdvice {
 
     @ExceptionHandler(Exception.class)
     public Object handleRuntimeException(Exception e) {
-        log.error("其他异常 uri : {} -> ", WebUtils.getRequest().getRequestURI(), e);
+        log.error("其他异常 uri : {} -> ", Objects.requireNonNull(WebUtils.getRequest()).getRequestURI(), e);
         return processResponse(new CommonException("服务器内部异常", 500));
     }
 
