@@ -16,7 +16,7 @@ spring:
         - id: user
           uri: lb://user
           predicates:
-            - Path=/users/**,/addresses/**
+            - Path=/users/**,/addresses/**,/oauth/**
           filters:
             - AddRequestHeader=X-Request-red, blue
         - id: commodity
@@ -43,5 +43,6 @@ shop:
     excludePaths:
       - /search/**
       - /users/login
+      - /oauth/**
       - /items/**
       - /hi

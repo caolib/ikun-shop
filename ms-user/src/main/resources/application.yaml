@@ -14,5 +14,6 @@ shop:
     excludePaths:
       - /search/**
       - /users/login
+      - /oauth/**
       - /items/**
       - /hi
