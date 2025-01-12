@@ -1,5 +1,8 @@
 server:
   port: 9200
+spring:
+  main:
+    banner-mode: off
 
 shop:
   jwt:

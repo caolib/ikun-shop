@@ -1,2 +1,5 @@
 server:
-  port: 9101
+  port: 9100
+spring:
+  main:
+    banner-mode: off
