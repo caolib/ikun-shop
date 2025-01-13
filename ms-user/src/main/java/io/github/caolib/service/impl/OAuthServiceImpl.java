@@ -8,6 +8,7 @@ import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.enums.GH;
+import io.github.caolib.exception.GitHubLoginException;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
 import io.github.caolib.service.OAuthService;
@@ -19,13 +20,19 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,23 +51,34 @@ public class OAuthServiceImpl implements OAuthService {
      */
     @Override
     public String getAccessToken(String code) {
-        RestTemplate restTemplate = new RestTemplate();
+        // 设置代理
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 7890));
+        factory.setProxy(proxy);
+        RestTemplate restTemplate = new RestTemplate(factory);
 
         // 设置请求头
         HttpEntity<MultiValueMap<String, String>> requestEntity = getMultiValueMapHttpEntity(code);
-        ResponseEntity<TokenResponse> responseEntity = restTemplate.exchange(
-                GH.TOKEN_URL,
-                HttpMethod.POST,
-                requestEntity,
-                TokenResponse.class
-        );
-
-        // 返回访问令牌
-        TokenResponse accessTokenResponse = responseEntity.getBody();
-        if (accessTokenResponse != null) {
-            return accessTokenResponse.getAccessToken();
-        } else {
-            throw new RuntimeException("获取访问令牌失败");
+        try {
+            ResponseEntity<TokenResponse> responseEntity = restTemplate.exchange(
+                    GH.TOKEN_URL,
+                    HttpMethod.POST,
+                    requestEntity,
+                    TokenResponse.class
+            );
+            // 返回访问令牌
+            TokenResponse accessTokenResponse = responseEntity.getBody();
+            if (accessTokenResponse != null) {
+                return accessTokenResponse.getAccessToken();
+            } else {
+                throw new RuntimeException("获取访问令牌失败");
+            }
+        } catch (ResourceAccessException e) {
+            if (Objects.requireNonNull(e.getMessage()).contains("github.com/login/oauth/access_token")) {
+                throw new GitHubLoginException("连接超时,请检查网络！", 401);
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -139,16 +157,19 @@ public class OAuthServiceImpl implements OAuthService {
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // 发送 GET 请求
-        ResponseEntity<GitHubUser> responseEntity = restTemplate.exchange(
-                GH.GITHUB_USER_API_URL,
-                org.springframework.http.HttpMethod.GET,
-                entity,
-                GitHubUser.class
-        );
-
-        log.debug(String.valueOf(responseEntity.getBody()));
-        return responseEntity.getBody();
+        // 发送请求
+        try {
+            ResponseEntity<GitHubUser> responseEntity = restTemplate.exchange(
+                    GH.GITHUB_USER_API_URL,
+                    org.springframework.http.HttpMethod.GET,
+                    entity,
+                    GitHubUser.class
+            );
+            log.debug("响应体{}", responseEntity.getBody());
+            return responseEntity.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new GitHubLoginException("获取GitHub用户信息失败", 401);
+        }
     }
 
 
