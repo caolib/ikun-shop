@@ -46,7 +46,7 @@ public class JwtTool {
     public Long parseToken(String token) {
         // 1.校验token是否为空
         if (token == null) {
-            log.debug("token为空");
+            log.error("token为空");
             throw new UnauthorizedException("未登录");
         }
         // 2.校验并解析jwt
@@ -54,27 +54,27 @@ public class JwtTool {
         try {
             jwt = JWT.of(token).setSigner(jwtSigner);
         } catch (Exception e) {
-            log.debug("token解析失败");
+            log.error("token解析失败");
             throw new UnauthorizedException("无效的token", e);
         }
         // 2.校验jwt是否有效
         if (!jwt.verify()) {
             // 验证失败
-            log.debug("token无效");
+            log.error("token无效");
             throw new UnauthorizedException("无效的token");
         }
         // 3.校验是否过期
         try {
             JWTValidator.of(jwt).validateDate();
         } catch (ValidateException e) {
-            log.debug("token已经过期");
+            log.error("token已经过期");
             throw new UnauthorizedException("token已经过期");
         }
         // 4.数据格式校验
         Object userPayload = jwt.getPayload("user");
         if (userPayload == null) {
             // 数据为空
-            log.debug("token数据载荷为空");
+            log.error("token数据载荷为空");
             throw new UnauthorizedException("无效的token");
         }
 
@@ -84,7 +84,7 @@ public class JwtTool {
             return Long.valueOf(userPayload.toString());
         } catch (RuntimeException e) {
             // 数据格式有误
-            log.debug("token数据载荷有误");
+            log.error("token数据载荷有误");
             throw new UnauthorizedException("无效的token");
         }
     }

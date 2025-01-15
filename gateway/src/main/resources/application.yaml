@@ -22,7 +22,7 @@ spring:
         - id: commodity
           uri: lb://commodity
           predicates:
-            - Path=/commodities/**,/search/**
+            - Path=/commodity/**,/search/**
         - id: pay
           uri: lb://pay
           predicates:

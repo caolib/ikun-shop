@@ -2,6 +2,8 @@ package io.github.caolib.handler;
 
 
 import io.github.caolib.domain.R;
+import io.github.caolib.exception.BadRequestException;
+import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.exception.GitHubLoginException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +33,36 @@ public class UserExceptionHandler {
         if (msg != null && msg.contains("github.com/login/oauth/access_token")) {
             log.error("连接超时,请检查网络！");
         }
+        return R.error(msg);
+    }
+
+    /**
+     * 请求异常
+     */
+    @ExceptionHandler(BadRequestException.class)
+    public Object handleRuntimeException(BadRequestException e) {
+        String msg = e.getMessage();
+        log.error(msg);
+        return R.error(msg);
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Object handleRuntimeException(IllegalArgumentException e) {
+        String msg = e.getMessage();
+        log.error(msg);
+        return R.error(msg);
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(BizIllegalException.class)
+    public Object handleRuntimeException(BizIllegalException e) {
+        String msg = e.getMessage();
+        log.error(msg);
         return R.error(msg);
     }
 }

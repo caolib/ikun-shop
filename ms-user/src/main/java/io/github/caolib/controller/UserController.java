@@ -26,7 +26,6 @@ public class UserController {
     public UserLoginVO login(@RequestBody @Validated LoginFormDTO loginFormDTO){
         return userService.login(loginFormDTO);
     }
-
     /**
      * 扣减余额
      * @param pw 支付密码
