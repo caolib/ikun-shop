@@ -35,10 +35,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String password = loginDTO.getPassword();
         // 2.根据用户名或手机号查询
         User user = lambdaQuery().eq(User::getUsername, username).one();
-        Assert.notNull(user, "用户名错误"); // 判断用户是否存在
+        Assert.notNull(user, "用户不存在"); // 判断用户是否存在
         // 3.校验是否禁用
         if (user.getStatus() == UserStatus.FROZEN) {
-            throw new ForbiddenException("用户被冻结");
+            throw new ForbiddenException("账号冻结");
         }
         // 4.校验密码
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -58,14 +58,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public void deductMoney(String pw, Integer totalFee) {
         log.debug("开始扣款");
-        // 1.校验密码
+        // 校验密码
         User user = getById(UserContext.getUser());
         if (user == null || !passwordEncoder.matches(pw, user.getPassword())) {
             // 密码错误
             throw new BizIllegalException("用户密码错误");
         }
-
-        // 2.尝试扣款
+        // 尝试扣款
         try {
             baseMapper.updateMoney(UserContext.getUser(), totalFee);
         } catch (Exception e) {

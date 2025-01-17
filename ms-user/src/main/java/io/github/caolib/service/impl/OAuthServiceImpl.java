@@ -165,7 +165,7 @@ public class OAuthServiceImpl implements OAuthService {
                     entity,
                     GitHubUser.class
             );
-            log.debug("响应体{}", responseEntity.getBody());
+            log.debug("{}", responseEntity.getBody());
             return responseEntity.getBody();
         } catch (HttpClientErrorException e) {
             throw new GitHubLoginException("获取GitHub用户信息失败", 401);

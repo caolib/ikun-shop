@@ -14,12 +14,14 @@ import javax.validation.constraints.Min;
 public class PageQuery {
     public static final Integer DEFAULT_PAGE_SIZE = 20;
     public static final Integer DEFAULT_PAGE_NUM = 1;
+
+
     @Min(value = 1, message = "页码不能小于1")
-    private Integer pageNo = DEFAULT_PAGE_NUM;
+    private Integer pageNo = DEFAULT_PAGE_NUM; // 页码
     @Min(value = 1, message = "每页查询数量不能小于1")
-    private Integer pageSize = DEFAULT_PAGE_SIZE;
-    private Boolean isAsc = true;
-    private String sortBy;
+    private Integer pageSize = DEFAULT_PAGE_SIZE; // 每页大小
+    private Boolean isAsc = true; // 是否升序
+    private String sortBy; // 排序字段
 
     public int from() {
         return (pageNo - 1) * pageSize;

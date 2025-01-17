@@ -26,7 +26,6 @@
         <module>ms-order</module>
         <module>ms-pay</module>
         <module>gateway</module>
-        <module>OAuth2</module>
     </modules>
 
     <!-- 版本等配置 -->
