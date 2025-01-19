@@ -7,8 +7,8 @@ import lombok.EqualsAndHashCode;
 /**
  * 商品分页查询条件
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class CommodityPageQuery extends PageQuery {
     /**
      * 搜索关键字

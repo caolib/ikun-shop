@@ -22,7 +22,7 @@ spring:
         - id: commodity
           uri: lb://commodity
           predicates:
-            - Path=/commodities/**,/search/**
+            - Path=/commodity/**,/search/**
         - id: pay
           uri: lb://pay
           predicates:
@@ -32,13 +32,12 @@ spring:
   main:
     banner-mode: off
 
-# 校验信息
+# 密钥校验信息
 shop:
   jwt:
     location: classpath:key.jks
     alias: ikun
     password: ikun-shop-123456
-    tokenTTL: 30m
   auth:
     excludePaths:
       - /search/**

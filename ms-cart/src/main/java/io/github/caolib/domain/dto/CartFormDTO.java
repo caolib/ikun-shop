@@ -13,11 +13,11 @@ public class CartFormDTO {
      */
     private Long itemId;
     /**
-     * 商品标题
+     * 商品名
      */
     private String name;
     /**
-     * 商品动态属性键值集
+     * 商品规格，颜色、尺寸等，使用json格式存储
      */
     private String spec;
     /**

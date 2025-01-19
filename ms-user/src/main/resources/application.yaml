@@ -9,7 +9,6 @@ shop:
     location: classpath:key.jks
     alias: ikun
     password: ikun-shop-123456
-    tokenTTL: 30m
   auth:
     excludePaths:
       - /search/**

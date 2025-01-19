@@ -68,14 +68,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // RPC -> 扣减库存
         R<Void> r = commodityClient.deductStock(detailDTOS);
-        //log.debug(r.toString());
-        // RPC -> 清理购物车商品
-        cartClient.deleteCartItemByIds(itemIds);
-
         if (r.getCode() != 200) {
             log.error(r.toString());
-            throw new BadRequestException("库存不足");
+            throw new BadRequestException("库存不足,下单失败");
         }
+        // RPC -> 清理购物车商品
+        cartClient.deleteCartItemByIds(itemIds);
 
         return order.getId();
     }

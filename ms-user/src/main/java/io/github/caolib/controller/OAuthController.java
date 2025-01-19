@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuthController {
     private final OAuthService OAuthService;
 
-    @GetMapping("/success")
-    public R<UserLoginVO> handleGitHubCallback(@RequestParam String code, @RequestParam(required = false) String state) {
-        log.debug("code: {} state: {}", code, state);
+    @GetMapping("/github")
+    public R<UserLoginVO> handleGitHubCallback(@RequestParam String code) {
+        log.debug("github授权码: {}", code);
 
         return OAuthService.login(code);
     }

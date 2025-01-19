@@ -35,24 +35,23 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
-        // 1.获取登录用户
+        // 获取登录用户
         Long userId = UserContext.getUser();
 
-        // 2.判断是否已经存在
+        // 判断是否已经存在
         if (checkItemExists(cartFormDTO.getItemId(), userId)) {
-            // 2.1.存在，则更新数量
+            // 存在，则更新数量
             baseMapper.updateNum(cartFormDTO.getItemId(), userId);
             return;
         }
-        // 2.2.不存在，判断是否超过购物车数量
+        // 不存在，判断是否超过购物车数量
         checkCartsFull(userId);
 
-        // 3.新增购物车条目
-        // 3.1.转换PO
-        Cart cart = BeanUtils.copyBean(cartFormDTO, Cart.class);
-        // 3.2.保存当前用户
+        // 新增购物车条目
+        Cart cart = BeanUtils.copyBean(cartFormDTO, Cart.class); // 转换为PO
+        // 设置当前用户ID
         cart.setUserId(userId);
-        // 3.3.保存到数据库
+        // 保存到数据库
         save(cart);
     }
 

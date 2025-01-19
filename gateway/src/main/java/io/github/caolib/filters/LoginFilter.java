@@ -36,6 +36,7 @@ public class LoginFilter implements GlobalFilter, Ordered {
         // 取出请求头中的token
         String token = request.getHeaders().getFirst("Authorization");
         Long userId; //用户ID
+
         try {
             userId = jwtTool.parseToken(token); // 尝试解析token
         } catch (UnauthorizedException e) {

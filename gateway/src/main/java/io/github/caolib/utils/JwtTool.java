@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
-import java.time.Duration;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Slf4j
@@ -22,70 +22,61 @@ public class JwtTool {
         this.jwtSigner = JWTSignerUtil.createSigner("rs256", keyPair);
     }
 
-    /**
-     * 创建 access-token
-     *
-     * @param userId 用户信息
-     * @return access-token
-     */
-    public String createToken(Long userId, Duration ttl) {
-        // 1.生成jws
-        return JWT.create()
-                .setPayload("user", userId)
-                .setExpiresAt(new Date(System.currentTimeMillis() + ttl.toMillis()))
-                .setSigner(jwtSigner)
-                .sign();
-    }
-
-    /**
-     * 解析token
-     *
-     * @param token token
-     * @return 解析刷新token得到的用户信息
-     */
     public Long parseToken(String token) {
-        // 1.校验token是否为空
         if (token == null) {
-            log.debug("token为空");
+            log.error("token为空");
             throw new UnauthorizedException("未登录");
         }
-        // 2.校验并解析jwt
+
         JWT jwt;
+        // 解析token
         try {
+            log.debug("token:{}", token);
             jwt = JWT.of(token).setSigner(jwtSigner);
         } catch (Exception e) {
-            log.debug("token解析失败");
+            log.error("token解析失败");
             throw new UnauthorizedException("无效的token", e);
         }
-        // 2.校验jwt是否有效
+
+        // 验证token
         if (!jwt.verify()) {
-            // 验证失败
-            log.debug("token无效");
+            log.error("token无效");
             throw new UnauthorizedException("无效的token");
         }
-        // 3.校验是否过期
+
+        // 验证token是否过期
         try {
             JWTValidator.of(jwt).validateDate();
         } catch (ValidateException e) {
-            log.debug("token已经过期");
+            log.error("token已经过期");
             throw new UnauthorizedException("token已经过期");
         }
-        // 4.数据格式校验
+
+        logDate(jwt); // 打印token过期时间
+
+        // 获取token中的用户id
         Object userPayload = jwt.getPayload("user");
         if (userPayload == null) {
-            // 数据为空
-            log.debug("token数据载荷为空");
+            log.error("token数载荷为空");
             throw new UnauthorizedException("无效的token");
         }
 
-        // 5.数据解析
+        // 解析用户id并返回
         try {
-            // 返回用户ID
             return Long.valueOf(userPayload.toString());
         } catch (RuntimeException e) {
-            // 数据格式有误
-            log.debug("token数据载荷有误");
+            log.error("token数据载荷有误");
             throw new UnauthorizedException("无效的token");
         }
+    }
+
+    /**
+     * 打印token过期时间
+     */
+    public void logDate(JWT jwt) {
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Integer exp = (Integer) jwt.getPayload("exp");
+        Date expiration = new Date(exp.longValue() * 1000);
+        log.debug("token过期时间: {}", DATE_FORMAT.format(expiration));
     }
 }
