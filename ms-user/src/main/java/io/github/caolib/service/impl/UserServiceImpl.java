@@ -59,14 +59,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public void deductMoney(String pw, Integer totalFee) {
         log.debug("开始扣款");
         // 校验密码
-        User user = getById(UserContext.getUser());
+        User user = getById(UserContext.getUserId());
         if (user == null || !passwordEncoder.matches(pw, user.getPassword())) {
             // 密码错误
             throw new BizIllegalException("用户密码错误");
         }
         // 尝试扣款
         try {
-            baseMapper.updateMoney(UserContext.getUser(), totalFee);
+            baseMapper.updateMoney(UserContext.getUserId(), totalFee);
         } catch (Exception e) {
             throw new RuntimeException("扣款失败，可能是余额不足！", e);
         }

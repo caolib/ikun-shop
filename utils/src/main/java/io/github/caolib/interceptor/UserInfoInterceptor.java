@@ -15,7 +15,7 @@ public class UserInfoInterceptor implements HandlerInterceptor {
         // 从请求头中获取用户id
         String userId = request.getHeader(Auth.USER_ID);
         if (StrUtil.isNotBlank(userId))
-            UserContext.setUser(Long.valueOf(userId)); // 保存到ThreadLocal中
+            UserContext.setUserId(Long.valueOf(userId)); // 保存到ThreadLocal中
         return true;
     }
 

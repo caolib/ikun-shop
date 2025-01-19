@@ -2,6 +2,7 @@ package io.github.caolib.exception;
 
 import lombok.Getter;
 
+// TODO 添加只有msg的构造方法
 @Getter
 public class CommonException extends RuntimeException{
     private final int code;

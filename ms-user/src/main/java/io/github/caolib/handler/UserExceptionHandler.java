@@ -65,4 +65,14 @@ public class UserExceptionHandler {
         log.error(msg);
         return R.error(msg);
     }
+
+    /**
+     * 运行时异常
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public Object handleRuntimeException(RuntimeException e) {
+        String msg = e.getMessage();
+        log.error(msg);
+        return R.error(msg);
+    }
 }

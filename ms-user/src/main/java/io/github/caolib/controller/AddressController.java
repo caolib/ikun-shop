@@ -35,7 +35,7 @@ public class AddressController {
         // 1.根据id查询
         Address address = addressService.getById(id);
         // 2.判断当前用户
-        Long userId = UserContext.getUser();
+        Long userId = UserContext.getUserId();
         if(!address.getUserId().equals(userId)){
             throw new BadRequestException("地址不属于当前登录用户");
         }
@@ -49,7 +49,7 @@ public class AddressController {
     @GetMapping
     public List<AddressDTO> findMyAddresses() {
         // 1.查询列表
-        List<Address> list = addressService.query().eq("user_id", UserContext.getUser()).list();
+        List<Address> list = addressService.query().eq("user_id", UserContext.getUserId()).list();
         // 2.判空
         if (CollUtils.isEmpty(list)) {
             return CollUtils.emptyList();

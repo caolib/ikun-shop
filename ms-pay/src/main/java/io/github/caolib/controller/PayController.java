@@ -46,7 +46,7 @@ public class PayController {
     }
 
     /**
-     * 尝试基于用户余额支付
+     * 使用用户余额支付
      * @param id 支付单id
      * @param payOrderFormDTO 支付订单表单数据传输对象
      */

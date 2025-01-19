@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CommodityClient;
 import io.github.caolib.config.CartProperties;
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CartFormDTO;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.po.Cart;
 import io.github.caolib.domain.vo.CartVO;
+import io.github.caolib.exception.AlreadyExistException;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.CartMapper;
 import io.github.caolib.service.ICartService;
@@ -32,17 +34,21 @@ import java.util.stream.Collectors;
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
     private final CommodityClient commodityClient;
     private final CartProperties cartProperties;
+    private final CartMapper cartMapper;
 
-    @Override
-    public void addItem2Cart(CartFormDTO cartFormDTO) {
-        // 获取登录用户
-        Long userId = UserContext.getUser();
+    /**
+     * 添加商品到购物车
+     *
+     * @param cartFormDTO 购物车表单
+     */
+    public void addToCart(CartFormDTO cartFormDTO) {
+        // 获取登录用户id
+        Long userId = UserContext.getUserId();
 
         // 判断是否已经存在
         if (checkItemExists(cartFormDTO.getItemId(), userId)) {
-            // 存在，则更新数量
-            baseMapper.updateNum(cartFormDTO.getItemId(), userId);
-            return;
+            // 已存在存在
+            throw new AlreadyExistException("购物车中已存在该商品", 400);
         }
         // 不存在，判断是否超过购物车数量
         checkCartsFull(userId);
@@ -55,25 +61,32 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         save(cart);
     }
 
+    /**
+     * 查询用户购物车列表
+     */
     @Override
     public List<CartVO> queryMyCarts() {
-        // 1.查询我的购物车列表
-        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUser()).list();
+        // 查询用户购物车列表
+        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUserId()).list();
         if (CollUtils.isEmpty(carts)) {
             return CollUtils.emptyList();
         }
 
-        // 2.转换VO
+        // 转换为VO
         List<CartVO> vos = BeanUtils.copyList(carts, CartVO.class);
 
-        // 3.处理VO中的商品信息
-        handleCartItems(vos);
+        // 更新购物车中的商品信息为最新信息
+        updateCartItems(vos);
 
-        // 4.返回
         return vos;
     }
 
-    private void handleCartItems(List<CartVO> vos) {
+    /**
+     * 更新购物车中的商品信息
+     *
+     * @param vos 购物车VO列表
+     */
+    private void updateCartItems(List<CartVO> vos) {
         // 1.获取商品id
         Set<Long> CommodityIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
 
@@ -86,28 +99,46 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 4.写入vo
         for (CartVO v : vos) {
             CommodityDTO item = itemMap.get(v.getItemId());
-            if (item == null)
-                continue;
+            if (item == null) continue;
             v.setNewPrice(item.getPrice());
             v.setStatus(item.getStatus());
             v.setStock(item.getStock());
         }
     }
 
+    /**
+     * 批量删除购物车中的商品
+     *
+     * @param ids 商品ID集合
+     */
     @Override
     @Transactional
-    public void removeByItemIds(Collection<Long> itemIds) {
+    public void removeByItemIds(Collection<Long> ids) {
         // 1.构建删除条件，userId和itemId
         QueryWrapper<Cart> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(Cart::getUserId, UserContext.getUser())
-                .in(Cart::getItemId, itemIds);
+                .eq(Cart::getUserId, UserContext.getUserId())
+                .in(Cart::getItemId, ids);
         // 2.删除
         remove(queryWrapper);
     }
 
     /**
+     * 更新购物车中商品数量
+     *
+     * @param id  购物车条目ID
+     * @param num 数量
+     */
+    @Override
+    public R<Void> updateCartItemNum(int id, int num) {
+        cartMapper.updateItemNum(id, num);
+        return R.ok();
+    }
+
+    /**
      * 检查购物车是否已满
+     *
+     * @param userId 用户ID
      */
     private void checkCartsFull(Long userId) {
         long count = lambdaQuery().eq(Cart::getUserId, userId).count();
@@ -117,6 +148,12 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         }
     }
 
+    /**
+     * 检查购物车中是否已经存在该商品
+     *
+     * @param itemId 商品ID
+     * @param userId 用户ID
+     */
     private boolean checkItemExists(Long itemId, Long userId) {
         long count = lambdaQuery()
                 .eq(Cart::getUserId, userId)

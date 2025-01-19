@@ -18,7 +18,7 @@ public class FeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
-            Long userId = UserContext.getUser();
+            Long userId = UserContext.getUserId();
             if (userId != null)
                 requestTemplate.header(Auth.USER_ID, userId.toString());
         };

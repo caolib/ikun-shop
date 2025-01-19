@@ -57,7 +57,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setTotalFee(total);
         // 设置订单其它属性
         order.setPaymentType(orderFormDTO.getPaymentType());
-        order.setUserId(UserContext.getUser());
+        order.setUserId(UserContext.getUserId());
         order.setStatus(1);
         // 将Order写入数据库order表中
         save(order);
