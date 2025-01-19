@@ -27,8 +27,6 @@ spring:
           uri: lb://pay
           predicates:
             - Path=/pays/**
-      default-filters:
-        - AddRequestHeader=X-Request-red, blue
   main:
     banner-mode: off
 
@@ -44,4 +42,12 @@ shop:
       - /users/login
       - /oauth/**
       - /items/**
-      - /hi
+      - /**/health
+
+# 健康状态检查
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: /gateway/health

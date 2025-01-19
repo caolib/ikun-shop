@@ -46,10 +46,10 @@ public class JwtTool {
 
         // 验证token是否过期
         try {
-            logDate(jwt); // 打印token过期时间
             JWTValidator.of(jwt).validateDate();
         } catch (ValidateException e) {
             log.error("token已经过期");
+            logDate(jwt); // 打印token过期时间
             throw new UnauthorizedException("token已经过期", 499);
         }
 

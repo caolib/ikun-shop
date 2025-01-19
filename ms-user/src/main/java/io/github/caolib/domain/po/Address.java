@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -23,6 +24,7 @@ import java.io.Serializable;
 @TableName("address")
 public class Address implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -69,7 +71,7 @@ public class Address implements Serializable {
     private Integer isDefault;
 
     /**
-     * 备注
+     * 地址别名
      */
     private String notes;
 

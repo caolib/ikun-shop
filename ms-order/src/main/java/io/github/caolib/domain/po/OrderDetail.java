@@ -7,16 +7,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 订单详情表
- * </p>
- *
- * @author 虎哥
- * @since 2023-05-05
+ * 订单详情
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -24,6 +20,7 @@ import java.time.LocalDateTime;
 @TableName("order_detail")
 public class OrderDetail implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
