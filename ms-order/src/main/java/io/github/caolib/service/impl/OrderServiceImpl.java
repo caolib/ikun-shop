@@ -15,6 +15,7 @@ import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.mapper.OrderMapper;
 import io.github.caolib.service.IOrderDetailService;
 import io.github.caolib.service.IOrderService;
+import io.github.caolib.utils.CollUtils;
 import io.github.caolib.utils.UserContext;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     @GlobalTransactional
     public Long createOrder(OrderFormDTO orderFormDTO) {
-        // 订单数据
+        // 订单
         Order order = new Order();
         // 查询商品
         List<OrderDetailDTO> detailDTOS = orderFormDTO.getDetails();
@@ -59,10 +60,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setPaymentType(orderFormDTO.getPaymentType());
         order.setUserId(UserContext.getUserId());
         order.setStatus(1);
-        // 将Order写入数据库order表中
+        // 将订单写入order表中
         save(order);
 
-        // 保存订单详情到order_detail表中
+        // 将订单详情写入order_detail表中
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);
 
@@ -91,6 +92,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public R<List<OrderVO>> getUserOrders() {
         Long userId = UserContext.getUserId();
 
+        // 获取用户所有订单id
+        List<Long> orders = lambdaQuery()
+                .eq(Order::getUserId, userId)
+                .list()
+                .stream()
+                .map(Order::getId)
+                .toList();;
+
+        if(CollUtils.isEmpty(orders)){
+            return R.ok(CollUtils.emptyList());
+        }
+
+        // 获取订单详情
+        List<OrderDetail> details = detailService.lambdaQuery()
+                .in(OrderDetail::getOrderId, orders)
+                .list();
 
 
         return null;

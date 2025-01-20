@@ -18,7 +18,9 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
 
         String path = request.getPath().toString();
         if(!path.endsWith("/health"))
-            log.debug("请求路径: {}", request.getPath());
+            log.debug("请求路径: {}", path);
+
+        //log.debug("请求路径: {}", path);
 
         // 放行
         return chain.filter(exchange);

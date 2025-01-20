@@ -27,6 +27,23 @@ spring:
           uri: lb://pay
           predicates:
             - Path=/pays/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://shop-clb.pages.dev/"
+              - "https://shop.caolib.us.kg"
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
   main:
     banner-mode: off
 

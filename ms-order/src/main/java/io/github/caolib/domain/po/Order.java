@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("order")
+@TableName("`order`") // order是mysql的保留关键字，需要转义
 public class Order implements Serializable {
 
     @Serial

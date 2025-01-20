@@ -19,6 +19,9 @@ import java.util.List;
 public class OrderController {
     private final IOrderService orderService;
 
+    /**
+     * 获取用户所有订单
+     */
     @GetMapping
     public R<List<OrderVO>> getUserOrders(){
         return orderService.getUserOrders();
