@@ -4,57 +4,87 @@ package io.github.caolib.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.caolib.client.OrderClient;
 import io.github.caolib.client.UserClient;
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayApplyDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
+import io.github.caolib.enums.Code;
+import io.github.caolib.enums.E;
 import io.github.caolib.enums.PayStatus;
+import io.github.caolib.enums.Q;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.PayOrderMapper;
 import io.github.caolib.service.IPayOrderService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
     private final UserClient userClient;
-    private final OrderClient orderClient;
+    //private final OrderClient orderClient;
+    private final RabbitTemplate rabbitTemplate;
+    private final PayOrderMapper payOrderMapper;
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
-        // 1.幂等性校验
+        // 幂等性校验
         PayOrder payOrder = checkIdempotent(applyDTO);
-        // 2.返回结果
-        return payOrder.getId().toString();
+        // 返回支付单
+        return String.valueOf(payOrder.getId());
+    }
+
+    @Override
+    public R<PayOrder> createPayOrder(PayApplyDTO applyDTO) {
+        // 幂等性校验
+        PayOrder payOrder = checkIdempotent(applyDTO);
+        // 返回支付单
+        return R.ok(payOrder);
     }
 
     @Override
     @Transactional
     public void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
-        // 1.查询支付单
+        String errorMsg = E.ORDER_STATUS_EXCEP;
+
+        // 查询支付单
         PayOrder po = getById(payOrderFormDTO.getId());
-        // 2.判断状态
+        // 判断状态
         if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
             // 订单不是未支付，状态异常
-            throw new BizIllegalException("交易已支付或关闭！");
+            throw new BizIllegalException(errorMsg);
         }
-        // 3.尝试扣减余额
-        //userService.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
+        // 扣减用户余额
         userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
-        // 4.修改支付单状态
+        // 修改支付单状态
         boolean success = markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now());
         if (!success) {
-            throw new BizIllegalException("交易已支付或关闭！");
+            throw new BizIllegalException(errorMsg);
         }
-        // 5.修改订单状态
-        orderClient.markOrderPaySuccess(po.getBizOrderNo());
+        // todo 发送消息到支付消息队列，修改订单状态
+        // orderClient.markOrderPaySuccess(po.getBizOrderNo());
+        Long orderId = po.getBizOrderNo();
+        try {
+            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId);
+            log.debug("发送了一条修改订单状态消息，orderId:{}", orderId);
+        }catch (Exception e){
+            log.error("发送修改订单状态消息失败，orderId:{}", orderId);
+        }
+    }
+
+    @Override
+    public R<String> getPayOrderId(Long bizOrderId) {
+        Long payOrderId = payOrderMapper.getPayOrderId(bizOrderId);
+        return R.ok(payOrderId.toString());
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
@@ -81,8 +111,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
         // 3.旧单已经存在，判断是否支付成功
         if (PayStatus.TRADE_SUCCESS.equalsValue(oldOrder.getStatus())) {
-            // 已经支付成功，抛出异常
-            throw new BizIllegalException("订单已经支付！");
+            // 订单已经支付
+            throw new BizIllegalException(Code.ORDER_ALREADY_PAY);
         }
         // 4.旧单已经存在，判断是否已经关闭
         if (PayStatus.TRADE_CLOSED.equalsValue(oldOrder.getStatus())) {

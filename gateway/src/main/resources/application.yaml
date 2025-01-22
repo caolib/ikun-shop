@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  application:
+    name: gateway
   cloud:
     gateway:
       # 路由规则
@@ -34,6 +36,7 @@ spring:
               - "https://shop-clb.pages.dev/"
               - "https://shop.caolib.us.kg"
               - "http://localhost:5173"
+              - "http://localhost:18080"
             allowedMethods:
               - GET
               - POST

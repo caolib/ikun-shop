@@ -11,9 +11,12 @@ import org.springframework.security.rsa.crypto.KeyStoreKeyFactory;
 import java.security.KeyPair;
 
 @Configuration
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, AuthProperties.class,AddrProperties.class})
 public class SecurityConfig {
 
+    /**
+     * 密码加密方式
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

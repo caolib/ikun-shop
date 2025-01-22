@@ -1,14 +1,18 @@
 server:
   port: 9200
 spring:
+  application:
+    name: user
   main:
     banner-mode: off
 
 shop:
+  # jwt令牌校验
   jwt:
     location: classpath:key.jks
     alias: ikun
     password: ikun-shop-123456
+  # 路径白名单
   auth:
     excludePaths:
       - /search/**
@@ -16,3 +20,6 @@ shop:
       - /oauth/**
       - /items/**
       - /hi
+# 地址
+addr:
+  max-count: 10

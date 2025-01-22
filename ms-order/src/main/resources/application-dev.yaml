@@ -5,9 +5,14 @@ database:
   username: root
   password: root
 
+
 management:
   endpoints:
     web:
       base-path: /
       path-mapping:
         health: /orders/health
+spring:
+  devtools:
+    restart:
+      enabled: true

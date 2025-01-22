@@ -1,5 +1,7 @@
 server:
   port: 9400
 spring:
+  application:
+    name: pay
   main:
     banner-mode: off

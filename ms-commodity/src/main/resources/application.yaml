@@ -1,5 +1,7 @@
 server:
   port: 9000
 spring:
+  application:
+    name: commodity
   main:
     banner-mode: off

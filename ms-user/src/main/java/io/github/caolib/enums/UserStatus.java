@@ -10,8 +10,8 @@ public enum UserStatus {
     NORMAL(1, "已激活"),
     ;
     @EnumValue
-    int value;
-    String desc;
+    final int value;
+    final String desc;
 
     UserStatus(Integer value, String desc) {
         this.value = value;

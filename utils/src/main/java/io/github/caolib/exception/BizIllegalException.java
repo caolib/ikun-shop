@@ -1,9 +1,19 @@
 package io.github.caolib.exception;
 
-public class BizIllegalException extends CommonException{
+import io.github.caolib.enums.Code;
+
+public class BizIllegalException extends CommonException {
 
     public BizIllegalException(String message) {
         super(message, 500);
+    }
+
+    public BizIllegalException(Code code) {
+        super(code.getMessage(), code.getCode());
+    }
+
+    public BizIllegalException(String message, int code) {
+        super(message, code);
     }
 
     public BizIllegalException(String message, Throwable cause) {

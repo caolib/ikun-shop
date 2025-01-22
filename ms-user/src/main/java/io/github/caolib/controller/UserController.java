@@ -35,4 +35,6 @@ public class UserController {
     public void deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount){
         userService.deductMoney(pw, amount);
     }
+
+    //TODO 用户注册功能
 }

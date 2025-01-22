@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
     private final CommodityClient commodityClient;
-    private final IOrderDetailService detailService;
     private final CartClient cartClient;
+    private final IOrderDetailService detailService;
 
     @Override
     @GlobalTransactional
@@ -62,6 +62,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setStatus(1);
         // 将订单写入order表中
         save(order);
+
+
 
         // 将订单详情写入order_detail表中
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
