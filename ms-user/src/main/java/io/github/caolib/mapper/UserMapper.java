@@ -13,4 +13,14 @@ public interface UserMapper extends BaseMapper<User> {
     @Insert("INSERT INTO user (username, create_time,update_time) VALUES (#{username}, #{createTime}, #{updateTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertUser(User user);
+
+    @Select("SELECT balance FROM user WHERE id = #{userId}")
+    Long getUserMoney(Long userId);
+
+
+    @Select("SELECT COUNT(*) FROM user WHERE username = #{username}")
+    int getUserByUsername(String username);
+
+    @Select("SELECT COUNT(*) FROM user WHERE phone = #{phone}")
+    int getUserByPhone(String phone);
 }

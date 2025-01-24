@@ -10,3 +10,7 @@ management:
       base-path: /
       path-mapping:
         health: /users/health
+spring:
+  devtools:
+    jmx:
+      enabled: false

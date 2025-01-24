@@ -5,7 +5,6 @@ import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.CommonException;
 import io.github.caolib.exception.DbException;
 import io.github.caolib.exception.UnauthorizedException;
-import io.github.caolib.utils.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.NestedServletException;
 
+import javax.validation.ConstraintViolationException;
 import java.net.BindException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,11 +66,20 @@ public class CommonExceptionAdvice {
         return R.error(e.getCode(), e.getMessage());
     }
 
+    /**
+     * 表单校验异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public R<String> handleConstraintViolationException(ConstraintViolationException ex) {
+        return R.error(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleRuntimeException(Exception e) {
-        log.error("其他异常 uri : {} -> ", Objects.requireNonNull(WebUtils.getRequest()).getRequestURI(), e);
+        log.error("未知异常 : {}", e.getMessage(), e);
         return processResponse(new CommonException("服务器内部异常", 500));
     }
+
 
     private ResponseEntity<R<Void>> processResponse(CommonException e) {
         return ResponseEntity.status(e.getCode()).body(R.error(e));

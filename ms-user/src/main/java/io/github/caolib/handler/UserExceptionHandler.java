@@ -57,7 +57,7 @@ public class UserExceptionHandler {
     }
 
     /**
-     * 参数异常
+     * 业务异常
      */
     @ExceptionHandler(BizIllegalException.class)
     public Object handleRuntimeException(BizIllegalException e) {

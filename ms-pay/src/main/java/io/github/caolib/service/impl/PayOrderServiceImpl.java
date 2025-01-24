@@ -18,11 +18,11 @@ import io.github.caolib.mapper.PayOrderMapper;
 import io.github.caolib.service.IPayOrderService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.UserContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
     private final UserClient userClient;
-    //private final OrderClient orderClient;
     private final RabbitTemplate rabbitTemplate;
     private final PayOrderMapper payOrderMapper;
 
@@ -52,7 +51,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
     @Override
-    @Transactional
+    @GlobalTransactional
     public void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
         String errorMsg = E.ORDER_STATUS_EXCEP;
 
@@ -63,20 +62,23 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             // 订单不是未支付，状态异常
             throw new BizIllegalException(errorMsg);
         }
-        // 扣减用户余额
-        userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
+        // RPC --> 扣减用户余额
+        R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
+        log.debug("扣减用户余额结果：{}", res);
+        if (res.getCode() != 200) {
+            throw new BizIllegalException(res.getMsg(), res.getCode());// 扣减余额失败
+        }
+
         // 修改支付单状态
         boolean success = markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now());
         if (!success) {
             throw new BizIllegalException(errorMsg);
         }
-        // todo 发送消息到支付消息队列，修改订单状态
-        // orderClient.markOrderPaySuccess(po.getBizOrderNo());
         Long orderId = po.getBizOrderNo();
         try {
-            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId);
+            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId); // 发送消息到MQ
             log.debug("发送了一条修改订单状态消息，orderId:{}", orderId);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("发送修改订单状态消息失败，orderId:{}", orderId);
         }
     }
@@ -87,6 +89,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         return R.ok(payOrderId.toString());
     }
 
+    /**
+     * 设置订单状态为支付成功
+     *
+     * @param id          支付单id
+     * @param successTime 支付成功时间
+     * @return 是否成功
+     */
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
         return lambdaUpdate()
                 .set(PayOrder::getStatus, PayStatus.TRADE_SUCCESS.getValue())
@@ -99,27 +108,27 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
 
     private PayOrder checkIdempotent(PayApplyDTO applyDTO) {
-        // 1.首先查询支付单
+        // 首先查询支付单
         PayOrder oldOrder = queryByBizOrderNo(applyDTO.getBizOrderNo());
-        // 2.判断是否存在
+        // 判断是否存在
         if (oldOrder == null) {
-            // 不存在支付单，说明是第一次，写入新的支付单并返回
+            // 不存在支付单，写入新的支付单并返回
             PayOrder payOrder = buildPayOrder(applyDTO);
             payOrder.setPayOrderNo(IdWorker.getId());
             save(payOrder);
             return payOrder;
         }
-        // 3.旧单已经存在，判断是否支付成功
+        // 支付单已经存在，判断是否支付成功
         if (PayStatus.TRADE_SUCCESS.equalsValue(oldOrder.getStatus())) {
             // 订单已经支付
             throw new BizIllegalException(Code.ORDER_ALREADY_PAY);
         }
-        // 4.旧单已经存在，判断是否已经关闭
+        // 判断是否已经关闭
         if (PayStatus.TRADE_CLOSED.equalsValue(oldOrder.getStatus())) {
             // 已经关闭，抛出异常
-            throw new BizIllegalException("订单已关闭");
+            throw new BizIllegalException(Code.ORDER_IS_CLOSED);
         }
-        // 5.旧单已经存在，判断支付渠道是否一致
+        // 判断支付渠道是否一致
         if (!StringUtils.equals(oldOrder.getPayChannelCode(), applyDTO.getPayChannelCode())) {
             // 支付渠道不一致，需要重置数据，然后重新申请支付单
             PayOrder payOrder = buildPayOrder(applyDTO);
@@ -129,10 +138,15 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             payOrder.setPayOrderNo(oldOrder.getPayOrderNo());
             return payOrder;
         }
-        // 6.旧单已经存在，且可能是未支付或未提交，且支付渠道一致，直接返回旧数据
+        // 未支付或未提交，直接返回旧数据
         return oldOrder;
     }
 
+    /**
+     * 初始化支付单数据
+     *
+     * @param payApplyDTO 支付申请数据
+     */
     private PayOrder buildPayOrder(PayApplyDTO payApplyDTO) {
         // 1.数据转换
         PayOrder payOrder = BeanUtils.toBean(payApplyDTO, PayOrder.class);
@@ -143,9 +157,12 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         return payOrder;
     }
 
+    /**
+     * 根据业务订单号查询支付单
+     *
+     * @param bizOrderNo 业务订单号
+     */
     public PayOrder queryByBizOrderNo(Long bizOrderNo) {
-        return lambdaQuery()
-                .eq(PayOrder::getBizOrderNo, bizOrderNo)
-                .one();
+        return lambdaQuery().eq(PayOrder::getBizOrderNo, bizOrderNo).one();
     }
 }

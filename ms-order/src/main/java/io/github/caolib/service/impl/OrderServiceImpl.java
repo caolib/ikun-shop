@@ -63,8 +63,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 将订单写入order表中
         save(order);
 
-
-
         // 将订单详情写入order_detail表中
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);

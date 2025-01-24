@@ -14,3 +14,6 @@ spring:
           - data-id: openfeign.yaml
           - data-id: sentinel.yaml
           - data-id: seata.yaml
+          - data-id: user.yaml
+
+# TODO 配置分组

@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="订单" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" activateToolWindowBeforeRun="false">
-    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="ms-order" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.OrderApp" />
     <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />

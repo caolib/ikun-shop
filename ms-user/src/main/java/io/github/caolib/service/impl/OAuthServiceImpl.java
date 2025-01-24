@@ -1,5 +1,6 @@
 package io.github.caolib.service.impl;
 
+import io.github.caolib.config.UserProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.po.GitHubUser;
 import io.github.caolib.domain.po.TokenResponse;
@@ -40,6 +41,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final OAuthMapper OAuthMapper;
     private final UserMapper userMapper;
     private final JwtTool jwtTool;
+    private final UserProperties userProperties;
 
     /**
      * 获取请求体
@@ -123,8 +125,11 @@ public class OAuthServiceImpl implements OAuthService {
             log.debug("用户不存在，开始创建用户...");
             // 创建用户
             user = User.builder().username(nickname)
+                    .balance(userProperties.getInitBalance())
+                    .password(userProperties.getInitPassword())
                     .createTime(LocalDateTime.now())
                     .updateTime(LocalDateTime.now()).build();
+            // 插入用户表
             userMapper.insert(user);
 
             log.debug("用户创建成功，开始创建用户授权信息...");
@@ -132,8 +137,7 @@ public class OAuthServiceImpl implements OAuthService {
             // 获取用户id
             Long userId = user.getId();
             // 创建用户授权信息
-            UserOAuth oauthUser = UserOAuth.builder()
-                    .accessToken(accessToken)
+            UserOAuth oauthUser = UserOAuth.builder().accessToken(accessToken)
                     .userId(userId)
                     .oauthId(String.valueOf(oauthId))
                     .username(username)
@@ -141,7 +145,7 @@ public class OAuthServiceImpl implements OAuthService {
                     .email(email)
                     .build();
 
-            // 插入用户授权信息
+            // 插入用户授权表
             OAuthMapper.insert(oauthUser);
             log.debug("用户授权信息创建成功");
         } else {

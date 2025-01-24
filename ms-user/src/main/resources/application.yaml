@@ -23,3 +23,8 @@ shop:
 # 地址
 addr:
   max-count: 10
+
+# 用户
+user:
+  init-balance: 1000
+  init-password: 123456

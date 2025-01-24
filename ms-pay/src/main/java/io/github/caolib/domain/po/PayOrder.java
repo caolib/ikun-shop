@@ -109,7 +109,7 @@ public class PayOrder implements Serializable {
     /**
      * 创建人
      */
-    private Long creater;
+    private Long creator;
 
     /**
      * 更新人

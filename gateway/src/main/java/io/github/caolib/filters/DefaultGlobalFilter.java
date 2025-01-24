@@ -17,10 +17,10 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
 
         String path = request.getPath().toString();
-        if(!path.endsWith("/health"))
-            log.debug("请求路径: {}", path);
-
-        //log.debug("请求路径: {}", path);
+        String referer = request.getHeaders().getFirst("Referer");
+        if(!path.endsWith("/health")) {
+            log.debug("{} ==> {}", referer,path);
+        }
 
         // 放行
         return chain.filter(exchange);

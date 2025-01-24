@@ -37,6 +37,7 @@ spring:
               - "https://shop.caolib.us.kg"
               - "http://localhost:5173"
               - "http://localhost:18080"
+              - http://localhost:1420
             allowedMethods:
               - GET
               - POST
@@ -49,7 +50,10 @@ spring:
 
   main:
     banner-mode: off
-
+  # 禁用jmx，防止热重载失败
+  devtools:
+    jmx:
+      enabled: false
 # 密钥校验信息
 shop:
   jwt:
@@ -60,6 +64,7 @@ shop:
     excludePaths:
       - /search/**
       - /users/login
+      - /users/register
       - /oauth/**
       - /items/**
       - /**/health
