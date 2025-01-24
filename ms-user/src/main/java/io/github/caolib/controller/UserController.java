@@ -1,15 +1,20 @@
 package io.github.caolib.controller;
 
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.LoginFormDTO;
+import io.github.caolib.domain.dto.RegisterFormDTO;
+import io.github.caolib.domain.vo.UserInfoVO;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户相关接口
  */
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -19,20 +24,41 @@ public class UserController {
 
     /**
      * 用户登录接口
+     *
      * @param loginFormDTO 登录表单
      * @return 用户登录信息
      */
-    @PostMapping("login")
-    public UserLoginVO login(@RequestBody @Validated LoginFormDTO loginFormDTO){
+    @PostMapping("/login")
+    public UserLoginVO login(@RequestBody @Validated LoginFormDTO loginFormDTO) {
         return userService.login(loginFormDTO);
     }
+
     /**
      * 扣减余额
-     * @param pw 支付密码
+     *
+     * @param pw     支付密码
      * @param amount 支付金额
      */
     @PutMapping("/money/deduct")
-    public void deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount){
-        userService.deductMoney(pw, amount);
+    public R<String> deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount) {
+        return userService.deductMoney(pw, amount);
     }
+
+    // 用户注册
+    @PostMapping("/register")
+    public R<Void> register(@RequestBody @Validated RegisterFormDTO registerFormDTO) {
+        log.debug("注册: {}", registerFormDTO);
+
+        return userService.register(registerFormDTO);
+    }
+
+
+    /**
+     * 获取用户信息
+     */
+    @GetMapping
+    public R<UserInfoVO> getUserInfo() {
+        return userService.getUserInfo();
+    }
+
 }

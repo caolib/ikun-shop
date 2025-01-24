@@ -1,23 +1,24 @@
 package io.github.caolib.controller;
 
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.AddressDTO;
 import io.github.caolib.domain.po.Address;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.service.IAddressService;
 import io.github.caolib.utils.BeanUtils;
-import io.github.caolib.utils.CollUtils;
 import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * 收货地址管理接口
  */
+@Slf4j
+@Validated
 @RestController
 @RequestMapping("/addresses")
 @RequiredArgsConstructor
@@ -27,16 +28,17 @@ public class AddressController {
 
     /**
      * 根据id查询地址
-     * @param id 地址id
+     *
+     * @param addressId 地址id
      * @return 地址信息
      */
-    @GetMapping("{addressId}")
-    public AddressDTO findAddressById(@PathVariable("addressId") Long id) {
+    @GetMapping("/{addressId}")
+    public AddressDTO findAddressById(@PathVariable Long addressId) {
         // 1.根据id查询
-        Address address = addressService.getById(id);
+        Address address = addressService.getById(addressId);
         // 2.判断当前用户
-        Long userId = UserContext.getUser();
-        if(!address.getUserId().equals(userId)){
+        Long userId = UserContext.getUserId();
+        if (!address.getUserId().equals(userId)) {
             throw new BadRequestException("地址不属于当前登录用户");
         }
         return BeanUtils.copyBean(address, AddressDTO.class);
@@ -44,17 +46,62 @@ public class AddressController {
 
     /**
      * 查询当前用户地址列表
+     *
      * @return 地址列表
      */
     @GetMapping
     public List<AddressDTO> findMyAddresses() {
-        // 1.查询列表
-        List<Address> list = addressService.query().eq("user_id", UserContext.getUser()).list();
-        // 2.判空
-        if (CollUtils.isEmpty(list)) {
-            return CollUtils.emptyList();
-        }
-        // 3.转vo
-        return BeanUtils.copyList(list, AddressDTO.class);
+        return addressService.getUserAddresses();
     }
+
+
+    /**
+     * 添加地址
+     *
+     * @param addressDTO 地址信息
+     */
+    @PostMapping
+    public R<Void> addAddress(@RequestBody AddressDTO addressDTO) {
+        log.debug("添加地址: {}", addressDTO);
+        return addressService.addAddress(addressDTO);
+    }
+
+    /**
+     * 设置默认地址
+     *
+     * @param addressId 地址id
+     */
+    @PutMapping("/{addressId}")
+    public R<Void> setDefaultAddress(@PathVariable Long addressId) {
+        log.debug("设置默认地址: {}", addressId);
+        addressService.setDefaultAddress(addressId);
+        return R.ok();
+    }
+
+    /**
+     * 更新地址信息
+     *
+     * @param addressDTO 地址信息
+     */
+    @PutMapping
+    public R<Void> updateAddress(@RequestBody AddressDTO addressDTO) {
+        log.debug("更新地址信息: {}", addressDTO);
+
+        addressService.updateAddress(addressDTO);
+        return R.ok();
+    }
+
+    /**
+     * 删除地址
+     *
+     * @param addressId 地址id
+     */
+    @DeleteMapping("/{addressId}")
+    public R<Void> deleteAddress(@PathVariable Long addressId) {
+        log.debug("删除地址: {}", addressId);
+        addressService.removeById(addressId);
+        return R.ok();
+    }
+
+
 }

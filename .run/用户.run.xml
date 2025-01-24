@@ -14,8 +14,7 @@
       <option name="Make" enabled="true" />
     </method>
   </configuration>
-  <configuration default="false" name="用户" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+  <configuration default="false" name="用户" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" activateToolWindowBeforeRun="false">
     <module name="ms-user" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.UserApp" />
     <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 public class CartVO {
     /**
-     * 购物车条目id
+     * 购物车记录id
      */
     private Long id;
     /**
@@ -26,11 +26,11 @@ public class CartVO {
      */
     private String name;
     /**
-     * 商品动态属性键值集
+     * 商品规格
      */
     private String spec;
     /**
-     * 价格,单位：分
+     * 价格,单位：元
      */
     private Integer price;
     /**

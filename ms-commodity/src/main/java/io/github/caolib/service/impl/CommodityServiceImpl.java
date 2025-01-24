@@ -14,6 +14,7 @@ import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.CommodityMapper;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
+import io.github.caolib.utils.CollUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,8 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
 
     @Override
     public List<CommodityDTO> queryItemByIds(Collection<Long> ids) {
+        if (CollUtils.isEmpty(ids))
+            return List.of();
         return BeanUtils.copyList(listByIds(ids), CommodityDTO.class);
     }
 

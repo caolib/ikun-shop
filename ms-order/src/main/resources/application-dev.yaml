@@ -4,3 +4,15 @@ database:
   port: 3306
   username: root
   password: root
+
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: /orders/health
+spring:
+  devtools:
+    jmx:
+    enabled: false

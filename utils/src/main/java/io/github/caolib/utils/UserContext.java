@@ -1,5 +1,8 @@
 package io.github.caolib.utils;
 
+/**
+ * 用户上下文
+ */
 public class UserContext {
     private static final ThreadLocal<Long> tl = new ThreadLocal<>();
 
@@ -7,7 +10,7 @@ public class UserContext {
      * 保存当前登录用户信息到ThreadLocal
      * @param userId 用户id
      */
-    public static void setUser(Long userId) {
+    public static void setUserId(Long userId) {
         tl.set(userId);
     }
 
@@ -15,7 +18,7 @@ public class UserContext {
      * 获取当前登录用户信息
      * @return 用户id
      */
-    public static Long getUser() {
+    public static Long getUserId() {
         return tl.get();
     }
 

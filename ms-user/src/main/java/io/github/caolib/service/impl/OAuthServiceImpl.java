@@ -1,6 +1,6 @@
 package io.github.caolib.service.impl;
 
-import io.github.caolib.config.JwtProperties;
+import io.github.caolib.config.UserProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.po.GitHubUser;
 import io.github.caolib.domain.po.TokenResponse;
@@ -41,7 +41,28 @@ public class OAuthServiceImpl implements OAuthService {
     private final OAuthMapper OAuthMapper;
     private final UserMapper userMapper;
     private final JwtTool jwtTool;
-    private final JwtProperties jwtProperties;
+    private final UserProperties userProperties;
+
+    /**
+     * 获取请求体
+     *
+     * @param code 授权码
+     * @return 请求体
+     */
+    @NotNull
+    private static HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+
+        // 设置请求体
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", GH.CLIENT_ID);
+        body.add("client_secret", GH.CLIENT_SECRET);
+        body.add("code", code);
+        body.add("redirect_uri", GH.CALL_BACK_URL); // 确保和 GitHub 应用中的回调 URL 一致
+
+        return new HttpEntity<>(body, headers);
+    }
 
     /**
      * 获取访问令牌
@@ -104,8 +125,11 @@ public class OAuthServiceImpl implements OAuthService {
             log.debug("用户不存在，开始创建用户...");
             // 创建用户
             user = User.builder().username(nickname)
+                    .balance(userProperties.getInitBalance())
+                    .password(userProperties.getInitPassword())
                     .createTime(LocalDateTime.now())
                     .updateTime(LocalDateTime.now()).build();
+            // 插入用户表
             userMapper.insert(user);
 
             log.debug("用户创建成功，开始创建用户授权信息...");
@@ -113,8 +137,7 @@ public class OAuthServiceImpl implements OAuthService {
             // 获取用户id
             Long userId = user.getId();
             // 创建用户授权信息
-            UserOAuth oauthUser = UserOAuth.builder()
-                    .accessToken(accessToken)
+            UserOAuth oauthUser = UserOAuth.builder().accessToken(accessToken)
                     .userId(userId)
                     .oauthId(String.valueOf(oauthId))
                     .username(username)
@@ -122,7 +145,7 @@ public class OAuthServiceImpl implements OAuthService {
                     .email(email)
                     .build();
 
-            // 插入用户授权信息
+            // 插入用户授权表
             OAuthMapper.insert(oauthUser);
             log.debug("用户授权信息创建成功");
         } else {
@@ -130,17 +153,10 @@ public class OAuthServiceImpl implements OAuthService {
             // 更新访问令牌
             OAuthMapper.updateAccessToken(oauthId, accessToken);
         }
-        // 生成TOKEN 返回
-        String token = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
-        UserLoginVO vo = new UserLoginVO();
-        vo.setUserId(user.getId());
-        vo.setUsername(user.getUsername());
-        vo.setBalance(user.getBalance());
-        vo.setToken(token);
-        vo.setAvatar(avatarUrl);
+        // 返回用户信息
+        UserLoginVO vo = jwtTool.setReturnUser(user, avatarUrl);
         return R.ok(vo);
     }
-
 
     /**
      * 获取 GitHub 用户信息
@@ -170,27 +186,5 @@ public class OAuthServiceImpl implements OAuthService {
         } catch (HttpClientErrorException e) {
             throw new GitHubLoginException("获取GitHub用户信息失败", 401);
         }
-    }
-
-
-    /**
-     * 获取请求体
-     *
-     * @param code 授权码
-     * @return 请求体
-     */
-    @NotNull
-    private static HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/json");
-
-        // 设置请求体
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", GH.CLIENT_ID);
-        body.add("client_secret", GH.CLIENT_SECRET);
-        body.add("code", code);
-        body.add("redirect_uri", GH.CALL_BACK_URL); // 确保和 GitHub 应用中的回调 URL 一致
-
-        return new HttpEntity<>(body, headers);
     }
 }

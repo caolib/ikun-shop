@@ -31,7 +31,7 @@ public class JwtTool {
         JWT jwt;
         // 解析token
         try {
-            log.debug("token:{}", token);
+            //log.debug("token:{}", token);
             jwt = JWT.of(token).setSigner(jwtSigner);
         } catch (Exception e) {
             log.error("token解析失败");
@@ -49,10 +49,10 @@ public class JwtTool {
             JWTValidator.of(jwt).validateDate();
         } catch (ValidateException e) {
             log.error("token已经过期");
-            throw new UnauthorizedException("token已经过期");
+            logDate(jwt); // 打印token过期时间
+            throw new UnauthorizedException("token已经过期", 499);
         }
 
-        logDate(jwt); // 打印token过期时间
 
         // 获取token中的用户id
         Object userPayload = jwt.getPayload("user");

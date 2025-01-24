@@ -31,6 +31,9 @@ public class DefaultExceptionHandler {
     public R<String> exceptionHandler(RmTransactionException ex) {
         String message = ex.getMessage();
         log.error("事务执行失败：{}", message);
+
+        if (message.contains("Timeout")) return R.error("请求超时，请稍后再试");
+
         return R.error(message);
     }
 }

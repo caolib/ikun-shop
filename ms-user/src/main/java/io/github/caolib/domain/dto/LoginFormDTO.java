@@ -20,7 +20,7 @@ public class LoginFormDTO {
     @NotNull(message = "密码不能为空")
     private String password;
     /**
-     * 是否记住我
+     * TODO 是否记住我 待删除
      */
     private Boolean rememberMe = false;
 }

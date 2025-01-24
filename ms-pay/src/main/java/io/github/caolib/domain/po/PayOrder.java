@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @TableName("pay_order")
 public class PayOrder implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -107,7 +109,7 @@ public class PayOrder implements Serializable {
     /**
      * 创建人
      */
-    private Long creater;
+    private Long creator;
 
     /**
      * 更新人

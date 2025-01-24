@@ -20,7 +20,7 @@ public class PayApplyDTO {
     /**
      * 支付金额必须为正数
      */
-    @Min(value = 1, message = "支付金额必须为正数")
+    @Min(value = 0, message = "支付金额必须为正数")
     private Integer amount;
     /**
      * 支付渠道编码不能为空

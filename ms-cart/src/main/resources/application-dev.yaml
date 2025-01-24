@@ -7,3 +7,14 @@ database:
   password: root
 cart:
   max-commodity-num: 3
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: /carts/health
+spring:
+  devtools:
+    jmx:
+    enabled: false

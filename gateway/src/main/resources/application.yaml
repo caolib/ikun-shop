@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  application:
+    name: gateway
   cloud:
     gateway:
       # 路由规则
@@ -27,11 +29,31 @@ spring:
           uri: lb://pay
           predicates:
             - Path=/pays/**
-      default-filters:
-        - AddRequestHeader=X-Request-red, blue
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://shop-clb.pages.dev/"
+              - "https://shop.caolib.us.kg"
+              - "http://localhost:5173"
+              - "http://localhost:18080"
+              - http://localhost:1420
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
   main:
     banner-mode: off
-
+  # 禁用jmx，防止热重载失败
+  devtools:
+    jmx:
+      enabled: false
 # 密钥校验信息
 shop:
   jwt:
@@ -42,6 +64,15 @@ shop:
     excludePaths:
       - /search/**
       - /users/login
+      - /users/register
       - /oauth/**
       - /items/**
-      - /hi
+      - /**/health
+
+# 健康状态检查
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: /gateway/health

@@ -21,7 +21,7 @@ public class CartFormDTO {
      */
     private String spec;
     /**
-     * 价格,单位：分
+     * 价格
      */
     private Integer price;
     /**

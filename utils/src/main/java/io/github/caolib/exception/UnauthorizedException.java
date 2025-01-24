@@ -6,6 +6,10 @@ public class UnauthorizedException extends CommonException{
         super(message, 401);
     }
 
+    public UnauthorizedException(String message,int code) {
+        super(message, code);
+    }
+
     public UnauthorizedException(String message, Throwable cause) {
         super(message, cause, 401);
     }

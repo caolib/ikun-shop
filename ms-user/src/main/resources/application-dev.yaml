@@ -3,3 +3,14 @@ database:
   host: localhost
   username: root
   password: root
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: /users/health
+spring:
+  devtools:
+    jmx:
+      enabled: false

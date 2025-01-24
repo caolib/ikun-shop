@@ -1,7 +1,9 @@
 package io.github.caolib.controller;
 
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayApplyDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
+import io.github.caolib.domain.po.PayOrder;
 import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.enums.PayType;
 import io.github.caolib.exception.BizIllegalException;
@@ -23,36 +25,54 @@ public class PayController {
     private final IPayOrderService payOrderService;
 
     /**
-     * 查询支付单
-     * @return 支付单列表
+     * 查询用户支付单
      */
     @GetMapping
-    public List<PayOrderVO> queryPayOrders(){
+    public List<PayOrderVO> queryPayOrders() {
         return BeanUtils.copyList(payOrderService.list(), PayOrderVO.class);
     }
 
     /**
      * 生成支付单
+     *
      * @param applyDTO 支付申请数据传输对象
-     * @return 支付单号
+     * @return 返回支付单记录号
      */
     @PostMapping
-    public String applyPayOrder(@RequestBody PayApplyDTO applyDTO){
-        if(!PayType.BALANCE.equalsValue(applyDTO.getPayType())){
-            // 目前只支持余额支付
-            throw new BizIllegalException("抱歉，目前只支持余额支付");
+    public R<PayOrder> applyPayOrder(@RequestBody PayApplyDTO applyDTO) {
+        if (!PayType.BALANCE.equalsValue(applyDTO.getPayType())) {
+            throw new BizIllegalException("目前只支持余额支付");
         }
-        return payOrderService.applyPayOrder(applyDTO);
+        return payOrderService.createPayOrder(applyDTO);
+    }
+
+    //@PostMapping
+    //public String applyPayOrder(@RequestBody PayApplyDTO applyDTO) {
+    //    if (!PayType.BALANCE.equalsValue(applyDTO.getPayType())) {
+    //        throw new BizIllegalException("目前只支持余额支付");
+    //    }
+    //    return payOrderService.applyPayOrder(applyDTO);
+    //}
+
+    /**
+     * 使用用户余额支付
+     *
+     * @param id  支付单记录id
+     * @param dto 支付订单表单数据传输对象
+     */
+    @PostMapping("/{id}")
+    public void tryPayOrderByBalance(@PathVariable Long id, @RequestBody PayOrderFormDTO dto) {
+        dto.setId(id);
+        payOrderService.tryPayOrderByBalance(dto);
     }
 
     /**
-     * 尝试基于用户余额支付
-     * @param id 支付单id
-     * @param payOrderFormDTO 支付订单表单数据传输对象
+     * 根据业务订单id查询支付单id
+     * @param bizOrderId 业务订单id
+     * @return 支付单id
      */
-    @PostMapping("{id}")
-    public void tryPayOrderByBalance(@PathVariable("id") Long id, @RequestBody PayOrderFormDTO payOrderFormDTO){
-        payOrderFormDTO.setId(id);
-        payOrderService.tryPayOrderByBalance(payOrderFormDTO);
+    @GetMapping("/{bizOrderId}")
+    public R<String> getPayOrderIdByBizOrderId(@PathVariable Long bizOrderId) {
+        return payOrderService.getPayOrderId(bizOrderId);
     }
 }
