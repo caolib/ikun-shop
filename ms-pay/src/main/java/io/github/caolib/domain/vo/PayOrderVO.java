@@ -34,11 +34,11 @@ public class PayOrderVO {
      */
     private Integer amount;
     /**
-     * 付类型，1：h5,2:小程序，3：公众号，4：扫码，5：余额支付
+     * 支付类型，1：h5,2:小程序，3：公众号，4：扫码，5：余额支付
      */
     private Integer payType;
     /**
-     * 付状态，0：待提交，1:待支付，2：支付超时或取消，3：支付成功
+     * 支付状态，0：待提交，1:待支付，2：支付超时或取消，3：支付成功
      */
     private Integer status;
     /**

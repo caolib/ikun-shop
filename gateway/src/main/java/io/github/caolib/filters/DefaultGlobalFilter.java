@@ -19,7 +19,7 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
         String path = request.getPath().toString();
         String referer = request.getHeaders().getFirst("Referer");
         if(!path.endsWith("/health")) {
-            log.debug("{} ==> {}", referer,path);
+            log.debug("[{} <== {}]", path,referer);
         }
 
         // 放行

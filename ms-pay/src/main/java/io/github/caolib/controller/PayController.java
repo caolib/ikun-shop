@@ -8,7 +8,6 @@ import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.enums.PayType;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.service.IPayOrderService;
-import io.github.caolib.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class PayController {
      */
     @GetMapping
     public List<PayOrderVO> queryPayOrders() {
-        return BeanUtils.copyList(payOrderService.list(), PayOrderVO.class);
+        return payOrderService.getUserPayOrders();
     }
 
     /**
@@ -46,14 +45,6 @@ public class PayController {
         return payOrderService.createPayOrder(applyDTO);
     }
 
-    //@PostMapping
-    //public String applyPayOrder(@RequestBody PayApplyDTO applyDTO) {
-    //    if (!PayType.BALANCE.equalsValue(applyDTO.getPayType())) {
-    //        throw new BizIllegalException("目前只支持余额支付");
-    //    }
-    //    return payOrderService.applyPayOrder(applyDTO);
-    //}
-
     /**
      * 使用用户余额支付
      *
@@ -61,9 +52,10 @@ public class PayController {
      * @param dto 支付订单表单数据传输对象
      */
     @PostMapping("/{id}")
-    public void tryPayOrderByBalance(@PathVariable Long id, @RequestBody PayOrderFormDTO dto) {
+    public R<Void> tryPayOrderByBalance(@PathVariable Long id, @RequestBody PayOrderFormDTO dto) {
         dto.setId(id);
-        payOrderService.tryPayOrderByBalance(dto);
+        payOrderService.payOrderByBalance(dto);
+        return R.ok();
     }
 
     /**

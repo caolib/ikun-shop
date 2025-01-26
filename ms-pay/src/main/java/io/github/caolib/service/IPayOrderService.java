@@ -6,6 +6,9 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayApplyDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
+import io.github.caolib.domain.vo.PayOrderVO;
+
+import java.util.List;
 
 public interface IPayOrderService extends IService<PayOrder> {
 
@@ -13,7 +16,11 @@ public interface IPayOrderService extends IService<PayOrder> {
 
     R<PayOrder> createPayOrder(PayApplyDTO applyDTO);
 
-    void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO);
+    void payOrderByBalance(PayOrderFormDTO payOrderFormDTO);
 
     R<String> getPayOrderId(Long bizOrderId);
+
+    void deleteByUserId(Long userId);
+
+    List<PayOrderVO> getUserPayOrders();
 }

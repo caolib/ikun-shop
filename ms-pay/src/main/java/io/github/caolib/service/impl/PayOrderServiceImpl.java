@@ -9,10 +9,8 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayApplyDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
-import io.github.caolib.enums.Code;
-import io.github.caolib.enums.E;
-import io.github.caolib.enums.PayStatus;
-import io.github.caolib.enums.Q;
+import io.github.caolib.domain.vo.PayOrderVO;
+import io.github.caolib.enums.*;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.PayOrderMapper;
 import io.github.caolib.service.IPayOrderService;
@@ -25,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -52,7 +51,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
     @Override
     @GlobalTransactional
-    public void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
+    public void payOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
         String errorMsg = E.ORDER_STATUS_EXCEP;
 
         // 查询支付单
@@ -74,19 +73,41 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         if (!success) {
             throw new BizIllegalException(errorMsg);
         }
+
+        // MQ --> 修改订单状态为支付成功
         Long orderId = po.getBizOrderNo();
         try {
-            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId); // 发送消息到MQ
-            log.debug("发送了一条修改订单状态消息，orderId:{}", orderId);
+            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId);
+            log.debug("<修改订单状态消息发送 --> MQ orderId:{}>", orderId);
         } catch (Exception e) {
-            log.error("发送修改订单状态消息失败，orderId:{}", orderId);
+            log.error("修改订单状态消息发送 --> MQ 失败，orderId:{}", orderId);
         }
     }
 
+    /**
+     * 根据业务订单id查询支付单id
+     * @param bizOrderId 业务订单id
+     * @return 支付单id
+     */
     @Override
     public R<String> getPayOrderId(Long bizOrderId) {
         Long payOrderId = payOrderMapper.getPayOrderId(bizOrderId);
         return R.ok(payOrderId.toString());
+    }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        payOrderMapper.updatePayStatusByUserId(userId);
+    }
+
+    @Override
+    public List<PayOrderVO> getUserPayOrders() {
+        // 获取用户id
+        Long userId = UserContext.getUserId();
+        // 查询用户支付单
+        List<PayOrder> list = lambdaQuery().eq(PayOrder::getBizUserId, userId).list();
+
+        return BeanUtils.copyList(list, PayOrderVO.class);
     }
 
     /**
@@ -148,11 +169,11 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
      * @param payApplyDTO 支付申请数据
      */
     private PayOrder buildPayOrder(PayApplyDTO payApplyDTO) {
-        // 1.数据转换
+        // 转换为PO
         PayOrder payOrder = BeanUtils.toBean(payApplyDTO, PayOrder.class);
-        // 2.初始化数据
-        payOrder.setPayOverTime(LocalDateTime.now().plusMinutes(120L));
-        payOrder.setStatus(PayStatus.WAIT_BUYER_PAY.getValue());
+        // 初始化数据
+        payOrder.setPayOverTime(LocalDateTime.now().plusSeconds(Time.TIMEOUT)); // 设置超时时间
+        payOrder.setStatus(PayStatus.WAIT_BUYER_PAY.getValue()); // 设置为等待支付状态
         payOrder.setBizUserId(UserContext.getUserId());
         return payOrder;
     }

@@ -146,7 +146,7 @@ public class OAuthServiceImpl implements OAuthService {
                     .build();
 
             // 插入用户授权表
-            OAuthMapper.insert(oauthUser);
+            OAuthMapper.addOauthUser(oauthUser);
             log.debug("用户授权信息创建成功");
         } else {
             user = userMapper.selectById(userOAuth.getUserId());

@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="io.github.caolib.mapper.OAuthMapper">
-    <insert id="insert">
-        INSERT INTO user.user_oauth
+    <insert id="addOauthUser">
+        INSERT INTO user_oauth
             (user_id, oauth_id, username, avatar_url, email)
         VALUES (#{userId}, #{oauthId}, #{username}, #{avatarUrl}, #{email})
     </insert>

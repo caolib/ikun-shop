@@ -15,7 +15,7 @@ public class JsonConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return jacksonObjectMapperBuilder -> {
-            // long -> string
+            // long -> string 序列化
             jacksonObjectMapperBuilder.serializerByType(Long.class, ToStringSerializer.instance);
             jacksonObjectMapperBuilder.serializerByType(BigInteger.class, ToStringSerializer.instance);
         };
