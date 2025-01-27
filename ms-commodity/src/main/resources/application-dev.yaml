@@ -11,6 +11,3 @@ management:
       base-path: /
       path-mapping:
         health: /commodity/health
-spring:
-  jmx:
-    enabled: false

@@ -1,5 +1,6 @@
 package io.github.caolib.mq;
 
+import io.github.caolib.domain.po.Order;
 import io.github.caolib.enums.Q;
 import io.github.caolib.service.IOrderService;
 import io.github.caolib.utils.CollUtils;
@@ -30,7 +31,14 @@ public class OrderStatusListener {
             exchange = @Exchange(name = Q.PAY_EXCHANGE),
             key = Q.PAY_SUCCESS_KEY))
     public void listenOrderPaySuccess(Long orderId) {
-        log.debug("<MQ <-- 修改订单{} 支付成功>", orderId);
+        log.debug("<MQ <-- 修改订单 {} 支付成功>", orderId);
+
+        Order order = orderService.getById(orderId);
+        if (order == null || order.getStatus() != 1) {
+            log.warn("<MQ <-- 订单 {} 不是待付款状态，修改失败>", orderId);
+            return;
+        }
+
         orderService.markOrderPaySuccess(orderId);
     }
 

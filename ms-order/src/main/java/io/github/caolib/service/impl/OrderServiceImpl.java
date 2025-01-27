@@ -84,6 +84,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // RPC -> 清理购物车商品
         cartClient.deleteCartItemByIds(itemIds);
 
+        // MQ -> 发送延迟[订单状态检测]消息
+
         return order.getId();
     }
 
@@ -137,7 +139,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Long userId = UserContext.getUserId();
 
         // 获取用户所有订单
-        List<Order> orders = lambdaQuery().eq(Order::getUserId, userId).list();
+        List<Order> orders = lambdaQuery()
+                .eq(Order::getUserId, userId)
+                .orderByDesc(Order::getCreateTime)
+                .list();
 
         // 检查订单是否超时
         List<Long> outDateOrderIds = new ArrayList<>(); //超时订单id

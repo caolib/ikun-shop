@@ -12,7 +12,3 @@ management:
       base-path: /
       path-mapping:
         health: /orders/health
-spring:
-  devtools:
-    jmx:
-    enabled: false
