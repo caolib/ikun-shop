@@ -60,11 +60,16 @@ public class PayController {
 
     /**
      * 根据业务订单id查询支付单id
-     * @param bizOrderId 业务订单id
+     * @param orderId 业务订单id
      * @return 支付单id
      */
-    @GetMapping("/{bizOrderId}")
-    public R<String> getPayOrderIdByBizOrderId(@PathVariable Long bizOrderId) {
-        return payOrderService.getPayOrderId(bizOrderId);
+    @GetMapping("/{orderId}")
+    public PayOrderVO getPayOrderIdByBizOrderId(@PathVariable Long orderId) {
+        return payOrderService.getPayOrderId(orderId);
+    }
+
+    @PutMapping("/{payOrderId}")
+    public void cancelPayOrder(@PathVariable Long payOrderId) {
+        payOrderService.cancelPayOrder(payOrderId);
     }
 }

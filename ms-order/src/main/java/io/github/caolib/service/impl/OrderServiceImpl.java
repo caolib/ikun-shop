@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.OrderStatus;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
+import io.github.caolib.client.PayClient;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
@@ -19,13 +20,14 @@ import io.github.caolib.mapper.OrderMapper;
 import io.github.caolib.service.IOrderDetailService;
 import io.github.caolib.service.IOrderService;
 import io.github.caolib.utils.BeanUtils;
-import io.github.caolib.utils.CollUtils;
+import io.github.caolib.utils.MessageConfig;
 import io.github.caolib.utils.UserContext;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,19 +42,19 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
     private final CommodityClient commodityClient;
     private final CartClient cartClient;
+    private final PayClient payClient;
     private final IOrderDetailService detailService;
     private final RabbitTemplate rabbitTemplate;
+    private final OrderMapper orderMapper;
 
     @Override
     @GlobalTransactional
     public Long createOrder(OrderFormDTO orderFormDTO) {
-        // 订单
-        Order order = new Order();
         // 查询商品
         List<OrderDetailDTO> detailDTOS = orderFormDTO.getDetails();
         // 获取商品id和数量的映射Map
-        Map<Long, Integer> itemNumMap = detailDTOS.stream().collect(Collectors.toMap(OrderDetailDTO::getItemId, OrderDetailDTO::getNum));
-        Set<Long> itemIds = itemNumMap.keySet();
+        Map<Long, Integer> idNumMap = detailDTOS.stream().collect(Collectors.toMap(OrderDetailDTO::getItemId, OrderDetailDTO::getNum));
+        Set<Long> itemIds = idNumMap.keySet();
         // 查询商品
         List<CommodityDTO> items = commodityClient.queryCommodityByIds(itemIds);
         if (items == null || items.size() < itemIds.size()) {
@@ -61,10 +63,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 计算商品总价 单价x数量
         int total = 0;
         for (CommodityDTO item : items) {
-            total += item.getPrice() * itemNumMap.get(item.getId());
+            total += item.getPrice() * idNumMap.get(item.getId());
         }
+        // 创建订单
+        Order order = new Order();
+        // 设置订单属性
         order.setTotalFee(total);
-        // 设置订单其它属性
         order.setPaymentType(orderFormDTO.getPaymentType());
         order.setUserId(UserContext.getUserId());
         order.setStatus(1);
@@ -72,7 +76,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         save(order);
 
         // 将订单详情写入order_detail表中
-        List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
+        List<OrderDetail> details = buildDetails(order.getId(), items, idNumMap);
         detailService.saveBatch(details);
 
         // RPC -> 扣减库存
@@ -81,10 +85,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             log.error(r.toString());
             throw new BadRequestException("扣减库存失败");
         }
-        // RPC -> 清理购物车商品
+        // RPC -> 清理购物车
         cartClient.deleteCartItemByIds(itemIds);
 
-        // MQ -> 发送延迟[订单状态检测]消息
+        // MQ -> 发送延迟消息，标记订单状态 [超时/已支付]
+        rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(Time.TIMEOUT.intValue()));
+        //rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(20000));
+        log.debug("<发送延迟消息，检查订单是否支付 --> MQ orderId:{}>", order.getId());
 
         return order.getId();
     }
@@ -104,30 +111,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     /**
-     * 获取用户所有订单详情
+     * 标记订单超时
+     *
+     * @param orderId 订单id
      */
     @Override
-    public R<List<OrderDetail>> getUserOrderDetails() {
-        Long userId = UserContext.getUserId();
+    @Transactional
+    public void markOrderTimeout(Long orderId) {
+        // 取消订单
+        orderMapper.markOrderTimeout(orderId, OrderStatus.CLOSED.getCode());
+        // 更新支付单
 
-        // 获取用户所有订单id
-        List<Long> orders = lambdaQuery()
-                .eq(Order::getUserId, userId)
-                .list()
-                .stream()
-                .map(Order::getId)
-                .toList();
 
-        if (CollUtils.isEmpty(orders)) {
-            return R.ok(CollUtils.emptyList());
+        // 查询订单详情
+        List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();
+        // 获取待恢复的商品列表
+        List<OrderDetailDTO> dtos = new ArrayList<>();
+        for (OrderDetail detail : details) {
+            OrderDetailDTO dto = new OrderDetailDTO();
+            dto.setItemId(detail.getItemId());
+            dto.setNum(detail.getNum());
+            dtos.add(dto);
         }
-
-        // 获取订单详情
-        List<OrderDetail> details = detailService.lambdaQuery()
-                .in(OrderDetail::getOrderId, orders)
-                .list();
-
-        return R.ok(details);
+        // RPC -> 释放库存
+        commodityClient.releaseStock(dtos);
     }
 
     /**
@@ -144,26 +151,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .orderByDesc(Order::getCreateTime)
                 .list();
 
-        // 检查订单是否超时
-        List<Long> outDateOrderIds = new ArrayList<>(); //超时订单id
-        for (Order order : orders) {
-            if (order.getStatus() == OrderStatus.NON_PAYMENT.getCode()) { // 如果订单未支付
-                // 如果订单超时
-                if (order.getCreateTime().plusSeconds(Time.TIMEOUT).isBefore(LocalDateTime.now())) {
-                    outDateOrderIds.add(order.getId());
-                    order.setStatus(OrderStatus.CLOSED.getCode()); // 修改订单状态为超时关闭
-                }
-            }
-        }
-        // MQ --> 发送[修改订单为超时状态]消息
-        if (!outDateOrderIds.isEmpty()) {
-            try {
-                rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_CLOSE_KEY, outDateOrderIds);
-                log.debug("<发送关闭订单消息 --> MQ orderIds:{}>", outDateOrderIds);
-            } catch (Exception e) {
-                log.error("<发送关闭订单消息失败 --> MQ orderIds:{}>", outDateOrderIds, e);
-            }
-        }
         // 转换为VO
         List<OrderVO2> orderVOS = BeanUtils.copyList(orders, OrderVO2.class);
 
@@ -197,13 +184,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return R.ok();
     }
 
-    @Override
-    public void markOrdersOutDate(List<Long> outDateOrderIds) {
-        // 修改订单状态为超时关闭
-        lambdaUpdate().in(Order::getId, outDateOrderIds)
-                .set(Order::getStatus, OrderStatus.CLOSED.getCode())
-                .update();
-    }
 
     /**
      * 构建订单详情信息

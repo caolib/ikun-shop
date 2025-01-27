@@ -18,4 +18,6 @@ public interface ICommodityService extends IService<Commodity> {
     List<CommodityDTO> queryItemByIds(Collection<Long> ids);
 
     PageDTO<CommodityDTO> pageQuery(CommodityPageQuery query);
+
+    void releaseStock(List<OrderDetailDTO> dtos);
 }

@@ -3,7 +3,6 @@ package io.github.caolib.mq;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.enums.Q;
 import io.github.caolib.service.IOrderService;
-import io.github.caolib.utils.CollUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -11,8 +10,6 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -40,24 +37,6 @@ public class OrderStatusListener {
         }
 
         orderService.markOrderPaySuccess(orderId);
-    }
-
-
-    /**
-     * 监听订单超时消息，修改订单为关闭状态
-     *
-     * @param outDateOrderIds 订单id
-     */
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = Q.CLOSE_PAY_ORDER_Q, durable = "true"),
-            exchange = @Exchange(name = Q.PAY_EXCHANGE),
-            key = Q.PAY_CLOSE_KEY))
-    public void listenOrderClose(List<String> outDateOrderIds) {
-        // 转换为Long
-        List<Long> ids = CollUtils.convertToLong(outDateOrderIds);
-
-        log.debug("<MQ <-- 关闭超时订单{}>", ids);
-        orderService.markOrdersOutDate(ids);
     }
 
 }

@@ -109,4 +109,9 @@ public class CommodityController {
     public R<Void> deductStock(@RequestBody List<OrderDetailDTO> items) {
        return commodityService.deductStock(items);
     }
+
+    @PutMapping("/release")
+    public void releaseStock(@RequestBody List<OrderDetailDTO> dtos) {
+        commodityService.releaseStock(dtos);
+    }
 }

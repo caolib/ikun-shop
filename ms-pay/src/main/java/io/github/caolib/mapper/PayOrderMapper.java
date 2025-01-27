@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Update;
 
 public interface PayOrderMapper extends BaseMapper<PayOrder> {
 
-    @Select("select pay_order_no from pay_order where biz_order_no = #{bizOrderId}")
+    @Select("SELECT pay_order_no FROM pay_order WHERE biz_order_no = #{bizOrderId}")
     Long getPayOrderId(Long bizOrderId);
 
-    @Update("update pay_order set is_delete = true where biz_user_id = #{userId}")
+    @Update("UPDATE pay_order SET is_delete = TRUE WHERE biz_user_id = #{userId}")
     void updatePayStatusByUserId(Long userId);
 }

@@ -23,7 +23,7 @@ public class PayOrderListener {
      * @param userId 用户id
      */
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = Q.DELETE_PAY_ORDER_Q, durable = "true"),
+            value = @Queue(name = Q.PAY_ORDER_DELETE_Q, durable = "true"),
             exchange = @Exchange(name = Q.PAY_EXCHANGE),
             key = Q.PAY_DELETE_KEY
     ))

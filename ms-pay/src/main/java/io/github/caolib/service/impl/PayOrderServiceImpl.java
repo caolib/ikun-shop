@@ -56,6 +56,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
         // 查询支付单
         PayOrder po = getById(payOrderFormDTO.getId());
+        log.debug("支付单查询结果：{}", po);
         // 判断状态
         if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
             // 订单不是未支付，状态异常
@@ -63,7 +64,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
         // RPC --> 扣减用户余额
         R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
-        log.debug("扣减用户余额结果：{}", res);
+        //log.debug("扣减用户余额结果：{}", res);
         if (res.getCode() != 200) {
             throw new BizIllegalException(res.getMsg(), res.getCode());// 扣减余额失败
         }
@@ -86,13 +87,14 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
     /**
      * 根据业务订单id查询支付单id
+     *
      * @param bizOrderId 业务订单id
      * @return 支付单id
      */
     @Override
-    public R<String> getPayOrderId(Long bizOrderId) {
-        Long payOrderId = payOrderMapper.getPayOrderId(bizOrderId);
-        return R.ok(payOrderId.toString());
+    public PayOrderVO getPayOrderId(Long bizOrderId) {
+        PayOrder payOrder = lambdaQuery().eq(PayOrder::getBizOrderNo, bizOrderId).one();
+        return BeanUtils.copyBean(payOrder, PayOrderVO.class);
     }
 
     @Override
@@ -108,6 +110,18 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         List<PayOrder> list = lambdaQuery().eq(PayOrder::getBizUserId, userId).list();
 
         return BeanUtils.copyList(list, PayOrderVO.class);
+    }
+
+    @Override
+    public void cancelPayOrder(Long payOrderId) {
+        // 查询支付单
+        PayOrder payOrder = getById(payOrderId);
+        if (payOrder == null) {
+            throw new BizIllegalException(Code.PAY_ORDER_NOT_FOUND);
+        }
+        // 修改支付单状态
+        payOrder.setStatus(PayStatus.TRADE_CLOSED.getValue());
+        updateById(payOrder);
     }
 
     /**
@@ -172,7 +186,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 转换为PO
         PayOrder payOrder = BeanUtils.toBean(payApplyDTO, PayOrder.class);
         // 初始化数据
-        payOrder.setPayOverTime(LocalDateTime.now().plusSeconds(Time.TIMEOUT)); // 设置超时时间
+        payOrder.setPayOverTime(LocalDateTime.now().plusSeconds(Time.TIMEOUT / 1000)); // 设置超时时间
         payOrder.setStatus(PayStatus.WAIT_BUYER_PAY.getValue()); // 设置为等待支付状态
         payOrder.setBizUserId(UserContext.getUserId());
         return payOrder;

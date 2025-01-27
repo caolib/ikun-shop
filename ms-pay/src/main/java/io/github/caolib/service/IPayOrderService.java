@@ -18,9 +18,11 @@ public interface IPayOrderService extends IService<PayOrder> {
 
     void payOrderByBalance(PayOrderFormDTO payOrderFormDTO);
 
-    R<String> getPayOrderId(Long bizOrderId);
+    PayOrderVO getPayOrderId(Long bizOrderId);
 
     void deleteByUserId(Long userId);
 
     List<PayOrderVO> getUserPayOrders();
+
+    void cancelPayOrder(Long payOrderId);
 }
