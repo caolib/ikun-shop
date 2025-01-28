@@ -4,9 +4,11 @@ import io.github.caolib.enums.Code;
 import io.github.caolib.exception.CommonException;
 import lombok.Data;
 
+import java.io.Serializable;
+
 
 @Data
-public class R<T> {
+public class R<T> implements Serializable {
     private int code;
     private String msg;
     private T data;

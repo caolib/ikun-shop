@@ -15,10 +15,7 @@ import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
 import io.github.caolib.domain.vo.UserInfoVO;
 import io.github.caolib.domain.vo.UserLoginVO;
-import io.github.caolib.enums.Code;
-import io.github.caolib.enums.E;
-import io.github.caolib.enums.Q;
-import io.github.caolib.enums.UserStatus;
+import io.github.caolib.enums.*;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.exception.ForbiddenException;
@@ -29,11 +26,12 @@ import io.github.caolib.service.IUserService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.JwtTool;
 import io.github.caolib.utils.PhoneUtil;
-import io.github.caolib.utils.UserContext;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -72,9 +70,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return jwtTool.setReturnUser(user, "");
     }
 
+    /**
+     * 扣减用户余额
+     * @param pw 支付密码
+     * @param totalFee 支付金额
+     * @param userId 用户id
+     */
     @Override
-    public R<String> deductMoney(String pw, Integer totalFee) {
-        Long userId = UserContext.getUserId();
+    @CacheEvict(value = Cache.USER_INFO, key = "#userId")
+    public R<String> deductBalance(String pw, Integer totalFee, Long userId) {
         // 校验密码
         User user = getById(userId);
         checkPwd(user, pw);
@@ -91,11 +95,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
 
+    /**
+     * 获取用户信息
+     * @param userId 用户id
+     */
     @Override
-    public R<UserInfoVO> getUserInfo() {
-        Long userId = UserContext.getUserId();
+    @Cacheable(value = Cache.USER_INFO, key = "#userId")
+    public R<UserInfoVO> getUserInfo(Long userId) {
         // 查询用户信息
         User user = getById(userId);
+
         // 判断用户是否存在
         if (user == null) {
             return R.error(Code.USER_NOT_EXIST);
@@ -120,6 +129,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return R.ok(userInfoVO);
     }
 
+    /**
+     * 用户注册
+     * @param registerFormDTO 注册表单
+     */
     @Override
     public R<Void> register(RegisterFormDTO registerFormDTO) {
         String username = registerFormDTO.getUsername();
@@ -154,9 +167,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return R.ok();
     }
 
+    /**
+     * 修改密码
+     * @param userId 用户id
+     * @param pwdFormDTO 密码表单
+     */
     @Override
-    public R<Void> changePassword(PwdFormDTO pwdFormDTO) {
-        Long userId = UserContext.getUserId();
+    @CacheEvict(value = Cache.USER_INFO, key = "#userId")
+    public R<Void> changePassword(Long userId,PwdFormDTO pwdFormDTO) {
         // 校验密码
         User user = getById(userId);
         checkPwd(user, pwdFormDTO.getOldPwd());
@@ -167,10 +185,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return R.ok();
     }
 
+
+    /**
+     * 注销账户
+     */
     @Override
     @GlobalTransactional
-    public R<Void> cancelAccount() {
-        Long userId = UserContext.getUserId();
+    @CacheEvict(value = Cache.USER_INFO, key = "#userId")
+    public R<Void> cancelAccount(Long userId) {
         // 删除用户
         removeById(userId);
 

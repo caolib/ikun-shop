@@ -6,10 +6,11 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Data
 @Validated
-public class RegisterFormDTO {
+public class RegisterFormDTO implements Serializable {
     @Size(min = 6, message = Valid.VALIDATION_USERNAME)
     private String username;
 

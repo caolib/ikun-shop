@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.UserClient;
 import io.github.caolib.domain.R;
-import io.github.caolib.domain.dto.PayApplyDTO;
+import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
 import io.github.caolib.domain.vo.PayOrderVO;
@@ -33,22 +33,54 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     private final RabbitTemplate rabbitTemplate;
     private final PayOrderMapper payOrderMapper;
 
+    //@Override
+    //public String applyPayOrder(PayFormDTO applyDTO) {
+    //    // 幂等性校验
+    //    PayOrder payOrder = checkIdempotent(applyDTO);
+    //    // 返回支付单
+    //    return String.valueOf(payOrder.getId());
+    //}
+
+    /**
+     * 查询用户支付单
+     */
     @Override
-    public String applyPayOrder(PayApplyDTO applyDTO) {
-        // 幂等性校验
-        PayOrder payOrder = checkIdempotent(applyDTO);
-        // 返回支付单
-        return String.valueOf(payOrder.getId());
+    public List<PayOrderVO> getUserPayOrders(Long userId) {
+        // 查询用户支付单
+        List<PayOrder> list = lambdaQuery().eq(PayOrder::getBizUserId, userId).list();
+
+        return BeanUtils.copyList(list, PayOrderVO.class);
     }
 
+    /**
+     * 根据业务订单id查询支付单id
+     *
+     * @param bizOrderId 业务订单id
+     * @return 支付单id
+     */
     @Override
-    public R<PayOrder> createPayOrder(PayApplyDTO applyDTO) {
+    public PayOrderVO getPayOrderId(Long bizOrderId) {
+        PayOrder payOrder = lambdaQuery().eq(PayOrder::getBizOrderNo, bizOrderId).one();
+        return BeanUtils.copyBean(payOrder, PayOrderVO.class);
+    }
+
+
+    /**
+     * 创建支付单
+     * @param payForm 用户下单表单
+     */
+    @Override
+    public R<PayOrder> createPayOrder(PayFormDTO payForm) {
         // 幂等性校验
-        PayOrder payOrder = checkIdempotent(applyDTO);
+        PayOrder payOrder = checkIdempotent(payForm);
         // 返回支付单
         return R.ok(payOrder);
     }
 
+    /**
+     * 使用用户余额支付
+     * @param payOrderFormDTO 支付订单表单数据传输对象
+     */
     @Override
     @GlobalTransactional
     public void payOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
@@ -59,7 +91,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         log.debug("支付单查询结果：{}", po);
         // 判断状态
         if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
-            // 订单不是未支付，状态异常
+            // 订单不是未支付
             throw new BizIllegalException(errorMsg);
         }
         // RPC --> 扣减用户余额
@@ -85,32 +117,19 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
     }
 
-    /**
-     * 根据业务订单id查询支付单id
-     *
-     * @param bizOrderId 业务订单id
-     * @return 支付单id
-     */
-    @Override
-    public PayOrderVO getPayOrderId(Long bizOrderId) {
-        PayOrder payOrder = lambdaQuery().eq(PayOrder::getBizOrderNo, bizOrderId).one();
-        return BeanUtils.copyBean(payOrder, PayOrderVO.class);
-    }
 
+
+    /**
+     * 根据用户id删除支付单
+     *
+     * @param userId 用户id
+     */
     @Override
     public void deleteByUserId(Long userId) {
         payOrderMapper.updatePayStatusByUserId(userId);
     }
 
-    @Override
-    public List<PayOrderVO> getUserPayOrders() {
-        // 获取用户id
-        Long userId = UserContext.getUserId();
-        // 查询用户支付单
-        List<PayOrder> list = lambdaQuery().eq(PayOrder::getBizUserId, userId).list();
 
-        return BeanUtils.copyList(list, PayOrderVO.class);
-    }
 
     @Override
     public void cancelPayOrder(Long payOrderId) {
@@ -142,7 +161,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
 
-    private PayOrder checkIdempotent(PayApplyDTO applyDTO) {
+    private PayOrder checkIdempotent(PayFormDTO applyDTO) {
         // 首先查询支付单
         PayOrder oldOrder = queryByBizOrderNo(applyDTO.getBizOrderNo());
         // 判断是否存在
@@ -182,7 +201,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
      *
      * @param payApplyDTO 支付申请数据
      */
-    private PayOrder buildPayOrder(PayApplyDTO payApplyDTO) {
+    private PayOrder buildPayOrder(PayFormDTO payApplyDTO) {
         // 转换为PO
         PayOrder payOrder = BeanUtils.toBean(payApplyDTO, PayOrder.class);
         // 初始化数据

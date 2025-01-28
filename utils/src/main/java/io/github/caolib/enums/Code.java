@@ -6,6 +6,8 @@ import lombok.Getter;
 public enum Code {
     SUCCESS(200, "操作成功"),
     BAD_REQUEST(400, "请求错误"),
+    ITEM_ALREADY_EXIST(400, "购物车中已存在该商品"),
+    ITEM_IS_OVERFLOW(400, "购物车中商品太多了"),
     UNAUTHORIZED(401, "未授权"),
     FORBIDDEN(403, "禁止访问"),
     USER_IS_FROZEN(403, "账号已冻结"),

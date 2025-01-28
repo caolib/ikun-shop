@@ -6,7 +6,7 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.po.Commodity;
-import io.github.caolib.domain.query.CommodityPageQuery;
+import io.github.caolib.domain.query.SearchQuery;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,9 +15,11 @@ public interface ICommodityService extends IService<Commodity> {
 
     R<Void> deductStock(List<OrderDetailDTO> items);
 
-    List<CommodityDTO> queryItemByIds(Collection<Long> ids);
+    List<CommodityDTO> getItemByIds(Collection<Long> ids);
 
-    PageDTO<CommodityDTO> pageQuery(CommodityPageQuery query);
+    PageDTO<CommodityDTO> pageQuery(SearchQuery query);
 
     void releaseStock(List<OrderDetailDTO> dtos);
+
+    //PageDTO<CommodityDTO> queryItemByPage(PageQuery query);
 }

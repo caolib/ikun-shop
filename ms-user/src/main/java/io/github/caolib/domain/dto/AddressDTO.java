@@ -3,12 +3,13 @@ package io.github.caolib.domain.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 收货地址实体
  */
 @Data
-public class AddressDTO {
+public class AddressDTO implements Serializable {
     /**
      * id
      */

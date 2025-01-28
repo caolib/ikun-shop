@@ -3,8 +3,10 @@ package io.github.caolib.domain.po;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class GitHubUser {
+public class GitHubUser implements Serializable {
 
     private Long id;
     private String login; // 用户名

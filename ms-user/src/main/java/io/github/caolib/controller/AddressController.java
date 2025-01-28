@@ -51,7 +51,7 @@ public class AddressController {
      */
     @GetMapping
     public List<AddressDTO> findMyAddresses() {
-        return addressService.getUserAddresses();
+        return addressService.getAddresses(UserContext.getUserId());
     }
 
 
@@ -63,7 +63,7 @@ public class AddressController {
     @PostMapping
     public R<Void> addAddress(@RequestBody AddressDTO addressDTO) {
         //log.debug("添加地址: {}", addressDTO);
-        return addressService.addAddress(addressDTO);
+        return addressService.addAddress(UserContext.getUserId(), addressDTO);
     }
 
     /**
@@ -74,7 +74,7 @@ public class AddressController {
     @PutMapping("/{addressId}")
     public R<Void> setDefaultAddress(@PathVariable Long addressId) {
         log.debug("设置默认地址: {}", addressId);
-        addressService.setDefaultAddress(addressId);
+        addressService.setDefaultAddress(UserContext.getUserId(),addressId);
         return R.ok();
     }
 
@@ -87,7 +87,7 @@ public class AddressController {
     public R<Void> updateAddress(@RequestBody AddressDTO addressDTO) {
         log.debug("更新地址信息: {}", addressDTO);
 
-        addressService.updateAddress(addressDTO);
+        addressService.updateAddress(UserContext.getUserId(), addressDTO);
         return R.ok();
     }
 

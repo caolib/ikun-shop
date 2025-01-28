@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface IAddressService extends IService<Address> {
 
-    List<AddressDTO> getUserAddresses();
+    List<AddressDTO> getAddresses(Long userId);
 
-    R<Void> addAddress(AddressDTO addressDTO);
+    R<Void> addAddress(Long userId,AddressDTO addressDTO);
 
-    void updateAddress(AddressDTO addressDTO);
+    void updateAddress(Long userId,AddressDTO addressDTO);
 
-    void setDefaultAddress(Long addressId);
+    void setDefaultAddress(Long userId,Long addressId);
 }

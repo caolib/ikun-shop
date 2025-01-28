@@ -9,13 +9,16 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.po.Commodity;
-import io.github.caolib.domain.query.CommodityPageQuery;
+import io.github.caolib.domain.query.SearchQuery;
+import io.github.caolib.enums.Cache;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.CommodityMapper;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.CollUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,52 +32,70 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     private final CommodityMapper commodityMapper;
 
     @Override
+    @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
+    public PageDTO<CommodityDTO> pageQuery(SearchQuery q) {
+        String key = q.getKey();
+        String brand = q.getBrand();
+        String category = q.getCategory();
+        Integer minPrice = q.getMinPrice();
+        Integer maxPrice = q.getMaxPrice();
+        // 分页查询
+        Page<Commodity> result = lambdaQuery()
+                .like(StrUtil.isNotBlank(key), Commodity::getName, key)
+                .eq(StrUtil.isNotBlank(brand), Commodity::getBrand, brand)
+                .eq(StrUtil.isNotBlank(category), Commodity::getCategory, category)
+                .eq(Commodity::getStatus, 1)
+                .ge(minPrice != null, Commodity::getPrice, minPrice)
+                .le(maxPrice != null, Commodity::getPrice, maxPrice)
+                .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
+        // 封装并返回
+        return PageDTO.of(result, CommodityDTO.class);
+    }
+
+
+    /**
+     * 扣减库存
+     *
+     * @param items 商品列表
+     */
+    @Override
     @Transactional
+    @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
     public R<Void> deductStock(List<OrderDetailDTO> items) {
-        // TODO 不使用字符串拼接
-        String sqlStatement = "io.github.caolib.mapper.CommodityMapper.updateStock";
-        boolean r;
-        try {
-            r = executeBatch(items, (sqlSession, entity) -> sqlSession.update(sqlStatement, entity));
-        } catch (Exception e) {
-            throw new BizIllegalException("更新库存异常，可能是库存不足!", e);
-        }
-        if (!r) {
-            throw new BizIllegalException("库存不足！");
-        }
+        // TODO 待测试
+        items.forEach(item -> {
+            Commodity commodity = getById(item.getItemId()); // 查询商品
+            if (commodity == null || commodity.getStock() < item.getNum()) {  // 库存不足
+                throw new BizIllegalException("库存不足！");
+            }
+            commodityMapper.updateStock(item);
+        });
         return R.ok();
     }
 
+    /**
+     * 根据id批量查询商品
+     *
+     * @param ids 商品id集合
+     */
     @Override
-    public List<CommodityDTO> queryItemByIds(Collection<Long> ids) {
+    @Cacheable(value = Cache.COMMODITY_IDS, key = "#ids")
+    public List<CommodityDTO> getItemByIds(Collection<Long> ids) {
         if (CollUtils.isEmpty(ids))
             return List.of();
         return BeanUtils.copyList(listByIds(ids), CommodityDTO.class);
     }
 
-    @Override
-    public PageDTO<CommodityDTO> pageQuery(CommodityPageQuery query) {
-        // 分页查询
-        Page<Commodity> result = lambdaQuery()
-                .like(StrUtil.isNotBlank(query.getKey()), Commodity::getName, query.getKey())
-                .eq(StrUtil.isNotBlank(query.getBrand()), Commodity::getBrand, query.getBrand())
-                .eq(StrUtil.isNotBlank(query.getCategory()), Commodity::getCategory, query.getCategory())
-                .eq(Commodity::getStatus, 1)
-                .ge(query.getMinPrice() != null, Commodity::getPrice, query.getMinPrice())
-                .le(query.getMaxPrice() != null, Commodity::getPrice, query.getMaxPrice())
-                .page(query.toMpPage("update_time", false));
-        // 封装并返回
-        return PageDTO.of(result, CommodityDTO.class);
-    }
 
     /**
      * 恢复库存
+     *
      * @param dtos 商品列表
      */
     @Override
+    @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
     public void releaseStock(List<OrderDetailDTO> dtos) {
         dtos.forEach(dto -> commodityMapper.recover(dto.getItemId(), dto.getNum()));
     }
-
 
 }

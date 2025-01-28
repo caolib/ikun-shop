@@ -2,11 +2,13 @@ package io.github.caolib.domain.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 商品实体
  */
 @Data
-public class CommodityDTO {
+public class CommodityDTO implements Serializable {
     /**
      * 商品id
      */
