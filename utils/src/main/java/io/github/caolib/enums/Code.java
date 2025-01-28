@@ -21,6 +21,7 @@ public enum Code {
     ORDER_IS_CLOSED(1008, "订单已关闭"),
     USERNAME_ALREADY_EXIST(1009, "用户名已存在"),
     PHONE_ALREADY_EXIST(1010, "电话已存在"),
+    PAY_ORDER_NOT_FOUND(1011, "支付单未找到"),
 
     ;
     private final int code;

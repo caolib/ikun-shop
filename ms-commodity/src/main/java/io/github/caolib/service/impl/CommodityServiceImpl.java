@@ -15,6 +15,7 @@ import io.github.caolib.mapper.CommodityMapper;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.CollUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity> implements ICommodityService {
+
+    private final CommodityMapper commodityMapper;
 
     @Override
     @Transactional
@@ -51,7 +55,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     @Override
     public PageDTO<CommodityDTO> pageQuery(CommodityPageQuery query) {
         // 分页查询
-         Page<Commodity> result = lambdaQuery()
+        Page<Commodity> result = lambdaQuery()
                 .like(StrUtil.isNotBlank(query.getKey()), Commodity::getName, query.getKey())
                 .eq(StrUtil.isNotBlank(query.getBrand()), Commodity::getBrand, query.getBrand())
                 .eq(StrUtil.isNotBlank(query.getCategory()), Commodity::getCategory, query.getCategory())
@@ -61,6 +65,15 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
                 .page(query.toMpPage("update_time", false));
         // 封装并返回
         return PageDTO.of(result, CommodityDTO.class);
+    }
+
+    /**
+     * 恢复库存
+     * @param dtos 商品列表
+     */
+    @Override
+    public void releaseStock(List<OrderDetailDTO> dtos) {
+        dtos.forEach(dto -> commodityMapper.recover(dto.getItemId(), dto.getNum()));
     }
 
 

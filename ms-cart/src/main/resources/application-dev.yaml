@@ -14,7 +14,3 @@ management:
       base-path: /
       path-mapping:
         health: /carts/health
-spring:
-  devtools:
-    jmx:
-    enabled: false

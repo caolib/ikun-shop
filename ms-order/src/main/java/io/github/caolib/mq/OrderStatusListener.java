@@ -1,5 +1,6 @@
-package io.github.caolib.listener;
+package io.github.caolib.mq;
 
+import io.github.caolib.domain.po.Order;
 import io.github.caolib.enums.Q;
 import io.github.caolib.service.IOrderService;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +19,23 @@ public class OrderStatusListener {
     private final IOrderService orderService;
 
     /**
-     * 监听订单支付成功消息，修改订单状态
+     * 监听订单支付成功消息，修改订单为成功状态
      *
      * @param orderId 订单id
      */
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = Q.PAY_SUCCESS_Q, durable = "true"),
             exchange = @Exchange(name = Q.PAY_EXCHANGE),
-            key = Q.PAY_SUCCESS_KEY
-    ))
+            key = Q.PAY_SUCCESS_KEY))
     public void listenOrderPaySuccess(Long orderId) {
-        log.debug("监听到一条修改订单状态消息，正在修改订单 {} 的状态为支付成功", orderId);
+        log.debug("<MQ <-- 修改订单 {} 支付成功>", orderId);
+
+        Order order = orderService.getById(orderId);
+        if (order == null || order.getStatus() != 1) {
+            log.warn("<MQ <-- 订单 {} 不是待付款状态，修改失败>", orderId);
+            return;
+        }
+
         orderService.markOrderPaySuccess(orderId);
     }
 

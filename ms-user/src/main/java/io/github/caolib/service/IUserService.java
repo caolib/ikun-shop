@@ -4,6 +4,7 @@ package io.github.caolib.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.LoginFormDTO;
+import io.github.caolib.domain.dto.PwdFormDTO;
 import io.github.caolib.domain.dto.RegisterFormDTO;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.vo.UserInfoVO;
@@ -18,4 +19,9 @@ public interface IUserService extends IService<User> {
     R<UserInfoVO> getUserInfo();
 
     R<Void> register(RegisterFormDTO registerFormDTO);
+
+    R<Void> changePassword(PwdFormDTO pwdFormDTO);
+
+    R<Void> cancelAccount();
+
 }

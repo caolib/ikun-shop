@@ -2,20 +2,27 @@ package io.github.caolib.service.impl;
 
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.caolib.client.CartClient;
 import io.github.caolib.config.UserProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.LoginFormDTO;
+import io.github.caolib.domain.dto.PwdFormDTO;
 import io.github.caolib.domain.dto.RegisterFormDTO;
+import io.github.caolib.domain.po.Address;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
 import io.github.caolib.domain.vo.UserInfoVO;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.enums.Code;
+import io.github.caolib.enums.E;
+import io.github.caolib.enums.Q;
 import io.github.caolib.enums.UserStatus;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.exception.ForbiddenException;
+import io.github.caolib.mapper.AddressMapper;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
 import io.github.caolib.service.IUserService;
@@ -23,8 +30,10 @@ import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.JwtTool;
 import io.github.caolib.utils.PhoneUtil;
 import io.github.caolib.utils.UserContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +48,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
     private final UserProperties userProperties;
+    private final RabbitTemplate rabbitTemplate;
+    private final CartClient cartClient;
+    private final AddressMapper addressMapper;
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {
@@ -65,11 +77,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Long userId = UserContext.getUserId();
         // 校验密码
         User user = getById(userId);
-        if (user == null || !passwordEncoder.matches(pw, user.getPassword())) {
-            Code error = Code.USERNAME_OR_PASSWORD_ERROR;
-            log.error(error.getMessage());
-            throw new BizIllegalException(error);
-        }
+        checkPwd(user, pw);
+
         // 查询账户余额
         Long money = userMapper.getUserMoney(userId);
         if (money < totalFee) {
@@ -105,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 电话号码脱敏,只显示前三位和后四位,中间用*代替
         String maskPhone = PhoneUtil.maskPhone(userInfoVO.getPhone());
-        log.debug("maskPhone:{}", maskPhone);
+        //log.debug("maskPhone:{}", maskPhone);
         userInfoVO.setPhone(maskPhone);
 
         return R.ok(userInfoVO);
@@ -118,7 +127,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String phone = registerFormDTO.getPhone();
 
         // 校验用户名是否存在
-        int count =  userMapper.getUserByUsername(username);
+        int count = userMapper.getUserByUsername(username);
         if (count > 0) {
             throw new BizIllegalException(Code.USERNAME_ALREADY_EXIST); // 用户名已存在
         }
@@ -143,5 +152,62 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         save(user);
 
         return R.ok();
+    }
+
+    @Override
+    public R<Void> changePassword(PwdFormDTO pwdFormDTO) {
+        Long userId = UserContext.getUserId();
+        // 校验密码
+        User user = getById(userId);
+        checkPwd(user, pwdFormDTO.getOldPwd());
+
+        // 更新密码
+        userMapper.updatePwd(userId, passwordEncoder.encode(pwdFormDTO.getNewPwd()));
+
+        return R.ok();
+    }
+
+    @Override
+    @GlobalTransactional
+    public R<Void> cancelAccount() {
+        Long userId = UserContext.getUserId();
+        // 删除用户
+        removeById(userId);
+
+        // 删除用户地址信息
+        addressMapper.delete(new LambdaQueryWrapper<Address>().eq(Address::getUserId, userId));
+
+        // 删除用户授权信息
+        oAuthMapper.deleteByUserId(userId);
+
+        // MQ --> 删除用户支付单信息
+        try {
+            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_DELETE_KEY, userId);
+            log.debug("<删除用户支付单信息 --> MQ，userId:{}>", userId);
+        } catch (Exception e) {
+            log.error(E.MQ_UPDATE_ORDER_STATUS_FAILED, userId);
+        }
+
+        // RPC --> 删除用户购物车所有信息
+        R<Void> res = cartClient.deleteCartByUserId(userId);
+        if (res.getCode() != 200) {
+            throw new BizIllegalException(E.RPC_DELETE_CART_FAILED);
+        }
+
+        return R.ok();
+    }
+
+
+
+
+    /**
+     * 校验密码
+     */
+    public void checkPwd(User user, String password) {
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            Code error = Code.USERNAME_OR_PASSWORD_ERROR;
+            log.error(error.getMessage());
+            throw new BizIllegalException(error);
+        }
     }
 }

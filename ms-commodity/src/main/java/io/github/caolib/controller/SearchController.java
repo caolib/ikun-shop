@@ -29,7 +29,7 @@ public class SearchController {
      */
     @GetMapping("/list")
     public PageDTO<CommodityDTO> search(CommodityPageQuery query) {
-        log.debug("搜索条件: {}", query);
+        //log.debug("搜索条件: {}", query);
         return commodityService.pageQuery(query);
     }
 }

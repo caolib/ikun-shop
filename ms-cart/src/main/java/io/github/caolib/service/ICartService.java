@@ -20,4 +20,6 @@ public interface ICartService extends IService<Cart> {
     void removeByItemIds(Collection<Long> itemIds);
 
     R<Void> updateCartItemNum(int id, int num);
+
+    R<Void> deleteByUserId(Long userId);
 }

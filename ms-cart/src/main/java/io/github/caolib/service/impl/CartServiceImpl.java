@@ -2,6 +2,7 @@ package io.github.caolib.service.impl;
 
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CommodityClient;
@@ -132,6 +133,19 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     @Override
     public R<Void> updateCartItemNum(int id, int num) {
         cartMapper.updateItemNum(id, num);
+        return R.ok();
+    }
+
+    /**
+     * 删除用户购物车所有信息
+     * @param userId 用户ID
+     */
+    @Override
+    public R<Void> deleteByUserId(Long userId) {
+
+        LambdaQueryWrapper<Cart> eq = new LambdaQueryWrapper<Cart>().eq(Cart::getUserId, userId);
+        remove(eq);
+
         return R.ok();
     }
 

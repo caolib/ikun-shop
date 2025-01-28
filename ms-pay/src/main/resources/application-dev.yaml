@@ -11,8 +11,3 @@ management:
       base-path: /
       path-mapping:
         health: /pays/health
-
-spring:
-  devtools:
-    jmx:
-      enabled: false

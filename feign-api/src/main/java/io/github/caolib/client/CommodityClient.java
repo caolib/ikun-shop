@@ -20,4 +20,8 @@ public interface CommodityClient {
 
     @PutMapping("/stock/deduct")
     R<Void> deductStock(@RequestBody List<OrderDetailDTO> items);
+
+
+    @PutMapping("/release")
+    void releaseStock(@RequestBody List<OrderDetailDTO> dtos);
 }

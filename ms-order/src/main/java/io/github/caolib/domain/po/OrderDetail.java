@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 订单详情
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false)  // TODO
 @Accessors(chain = true)
 @TableName("order_detail")
 public class OrderDetail implements Serializable {
@@ -50,7 +50,7 @@ public class OrderDetail implements Serializable {
     private String name;
 
     /**
-     * 商品动态属性键值集
+     * 商品规格 键值对
      */
     private String spec;
 

@@ -62,7 +62,7 @@ public class AddressController {
      */
     @PostMapping
     public R<Void> addAddress(@RequestBody AddressDTO addressDTO) {
-        log.debug("添加地址: {}", addressDTO);
+        //log.debug("添加地址: {}", addressDTO);
         return addressService.addAddress(addressDTO);
     }
 
