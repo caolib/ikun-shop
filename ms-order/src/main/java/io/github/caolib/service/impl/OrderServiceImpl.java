@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -116,12 +115,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @param orderId 订单id
      */
     @Override
-    @Transactional
+    @GlobalTransactional
     public void markOrderTimeout(Long orderId) {
         // 取消订单
         orderMapper.markOrderTimeout(orderId, OrderStatus.CLOSED.getCode());
-        // 更新支付单
 
+        // RPC -> 查询支付单
+        Long payOrderId = payClient.getPayOrderByOrderId(orderId).getId();
+        // RPC -> 取消支付单
+        payClient.cancelPayOrder(payOrderId);
 
         // 查询订单详情
         List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();

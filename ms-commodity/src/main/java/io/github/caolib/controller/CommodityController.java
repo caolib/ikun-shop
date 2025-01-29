@@ -10,6 +10,7 @@ import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class CommodityController {
      * @return 分页结果
      */
     @GetMapping("/list")
-    public PageDTO<CommodityDTO> search(SearchQuery query) {
+    public PageDTO<CommodityDTO> search(@Validated SearchQuery query) {
         log.debug("搜索条件: {}", query);
         return commodityService.pageQuery(query);
     }
