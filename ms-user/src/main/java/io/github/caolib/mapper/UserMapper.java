@@ -10,13 +10,11 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-    @Update("update user set balance = balance - ${totalFee} where id = #{userId}")
+    @Update("UPDATE user SET balance = balance - ${totalFee} WHERE id = #{userId}")
     void updateMoney(@Param("userId") Long userId, @Param("totalFee") Integer totalFee);
-
 
     @Select("SELECT balance FROM user WHERE id = #{userId}")
     Long getUserMoney(Long userId);
-
 
     @Select("SELECT COUNT(*) FROM user WHERE username = #{username}")
     int getUserByUsername(String username);

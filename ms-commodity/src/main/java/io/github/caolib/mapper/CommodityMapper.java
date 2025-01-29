@@ -15,6 +15,6 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
 
     void updateStockBatch(@Param("items") List<OrderDetailDTO> items);
 
-    @Update("update commodity set stock = stock + #{num} where id = #{itemId}")
+    @Update("UPDATE commodity SET stock = stock + #{num} WHERE id = #{itemId}")
     void recover(Long itemId, Integer num);
 }

@@ -19,7 +19,7 @@ public class OrderExceptionHandler {
     @ExceptionHandler(BizIllegalException.class)
     public R<String> exceptionHandler(BizIllegalException ex) {
         String message = ex.getMessage();
-        logErr(ex, "业务异常" + message);
+        logErr(ex, message);
         return R.error(message);
     }
 
@@ -29,12 +29,13 @@ public class OrderExceptionHandler {
      */
     @ExceptionHandler(RmTransactionException.class)
     public R<String> exceptionHandler(RmTransactionException ex) {
-        String message = ex.getMessage();
-        logErr(ex, "事务执行失败" + message);
-
-        if (message.contains("Timeout"))
+        String msg = ex.getMessage();
+        if (msg.contains("Timeout")) {
+            logErr(ex, "事务执行失败 " + msg);
             return R.error("请求超时，请稍后再试");
+        }
+        logErr(ex, "事务执行失败 " + msg);
 
-        return R.error(message);
+        return R.error(msg);
     }
 }
