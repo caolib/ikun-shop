@@ -4,12 +4,14 @@ import io.github.caolib.domain.PageQuery;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * 商品分页查询条件
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CommodityPageQuery extends PageQuery {
+public class CommodityPageQuery extends PageQuery implements Serializable {
     /**
      * 搜索关键字
      */

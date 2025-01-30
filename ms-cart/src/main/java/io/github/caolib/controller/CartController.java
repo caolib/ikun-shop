@@ -5,6 +5,7 @@ import io.github.caolib.domain.dto.CartFormDTO;
 import io.github.caolib.domain.po.Cart;
 import io.github.caolib.domain.vo.CartVO;
 import io.github.caolib.service.ICartService;
+import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class CartController {
      */
     @GetMapping
     public List<CartVO> queryMyCarts() {
-        return cartService.queryMyCarts();
+        return cartService.queryMyCarts(UserContext.getUserId());
     }
 
     /**
@@ -40,7 +41,7 @@ public class CartController {
      */
     @PostMapping
     public void addItem2Cart(@Valid @RequestBody CartFormDTO cartFormDTO) {
-        cartService.addToCart(cartFormDTO);
+        cartService.addToCart(UserContext.getUserId(),cartFormDTO);
     }
 
     /**
@@ -55,13 +56,12 @@ public class CartController {
 
     /**
      * 更新购物车中商品数量
-     *
-     * @param id  购物车条目id
+     * @param id 购物车条目id
      * @param num 商品数量
      */
     @PutMapping("/{id}/{num}")
     public R<Void> updateCartItemNum(@PathVariable int id, @PathVariable int num) {
-        return cartService.updateCartItemNum(id, num);
+        return cartService.updateCartItemNum(id, num, UserContext.getUserId());
     }
 
 

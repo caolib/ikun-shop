@@ -13,13 +13,13 @@ import java.util.List;
 
 public interface ICartService extends IService<Cart> {
 
-    void addToCart(CartFormDTO cartFormDTO);
+    void addToCart(Long userId, CartFormDTO cartFormDTO);
 
-    List<CartVO> queryMyCarts();
+    List<CartVO> queryMyCarts(Long userId);
 
     void removeByItemIds(Collection<Long> itemIds);
 
-    R<Void> updateCartItemNum(int id, int num);
+    R<Void> updateCartItemNum(int id, int num, Long userId);
 
     R<Void> deleteByUserId(Long userId);
 }

@@ -1,7 +1,6 @@
 package io.github.caolib.service.impl;
 
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,7 +11,7 @@ import io.github.caolib.domain.dto.CartFormDTO;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.po.Cart;
 import io.github.caolib.domain.vo.CartVO;
-import io.github.caolib.exception.AlreadyExistException;
+import io.github.caolib.enums.Code;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.CartMapper;
 import io.github.caolib.service.ICartService;
@@ -40,18 +39,17 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     /**
      * 添加商品到购物车
      *
+     * @param userId      用户ID
      * @param cartFormDTO 购物车表单
      */
-    public void addToCart(CartFormDTO cartFormDTO) {
-        // 获取登录用户id
-        Long userId = UserContext.getUserId();
-
-        // 判断是否已经存在
+    @Override
+    public void addToCart(Long userId, CartFormDTO cartFormDTO) {
+        // 判断购物车是否已经存在商品
         if (checkItemExists(cartFormDTO.getItemId(), userId)) {
-            // 已存在存在
-            throw new AlreadyExistException("购物车中已存在该商品", 400);
+            throw new BizIllegalException(Code.ITEM_ALREADY_EXIST);
+            //throw new AlreadyExistException("购物车中已存在该商品", 400);// 已存在存在
         }
-        // 不存在，判断是否超过购物车数量
+        // 判断是否超过购物车数量
         checkCartsFull(userId);
 
         // 新增购物车条目
@@ -66,9 +64,9 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
      * 查询用户购物车列表
      */
     @Override
-    public List<CartVO> queryMyCarts() {
+    public List<CartVO> queryMyCarts(Long userId) {
         // 查询用户购物车列表
-        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUserId()).list();
+        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, userId).list();
         if (CollUtils.isEmpty(carts)) {
             return CollUtils.emptyList();
         }
@@ -80,6 +78,51 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         updateCartItems(vos);
 
         return vos;
+    }
+
+
+    /**
+     * 批量删除购物车中的商品
+     *
+     * @param ids 商品ID集合
+     */
+    @Override
+    @Transactional
+    public void removeByItemIds(Collection<Long> ids) {
+        // 1.构建删除条件，userId和itemId
+        QueryWrapper<Cart> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(Cart::getUserId, UserContext.getUserId())
+                .in(Cart::getItemId, ids);
+        // 2.删除
+        remove(queryWrapper);
+    }
+
+    /**
+     * 更新购物车中商品数量
+     *
+     * @param id     购物车条目ID
+     * @param num    数量
+     * @param userId 用户ID
+     */
+    @Override
+    public R<Void> updateCartItemNum(int id, int num, Long userId) {
+        cartMapper.updateItemNum(id, num);
+        return R.ok();
+    }
+
+    /**
+     * 删除用户购物车所有信息
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    public R<Void> deleteByUserId(Long userId) {
+
+        LambdaQueryWrapper<Cart> eq = new LambdaQueryWrapper<Cart>().eq(Cart::getUserId, userId);
+        remove(eq);
+
+        return R.ok();
     }
 
     /**
@@ -108,48 +151,6 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     }
 
     /**
-     * 批量删除购物车中的商品
-     *
-     * @param ids 商品ID集合
-     */
-    @Override
-    @Transactional
-    public void removeByItemIds(Collection<Long> ids) {
-        // 1.构建删除条件，userId和itemId
-        QueryWrapper<Cart> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-                .eq(Cart::getUserId, UserContext.getUserId())
-                .in(Cart::getItemId, ids);
-        // 2.删除
-        remove(queryWrapper);
-    }
-
-    /**
-     * 更新购物车中商品数量
-     *
-     * @param id  购物车条目ID
-     * @param num 数量
-     */
-    @Override
-    public R<Void> updateCartItemNum(int id, int num) {
-        cartMapper.updateItemNum(id, num);
-        return R.ok();
-    }
-
-    /**
-     * 删除用户购物车所有信息
-     * @param userId 用户ID
-     */
-    @Override
-    public R<Void> deleteByUserId(Long userId) {
-
-        LambdaQueryWrapper<Cart> eq = new LambdaQueryWrapper<Cart>().eq(Cart::getUserId, userId);
-        remove(eq);
-
-        return R.ok();
-    }
-
-    /**
      * 检查购物车是否已满
      *
      * @param userId 用户ID
@@ -157,9 +158,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     private void checkCartsFull(Long userId) {
         long count = lambdaQuery().eq(Cart::getUserId, userId).count();
         int max = cartProperties.getMaxCommodityNum(); // 购物车中商品数量上限
-        if (count >= max) {
-            throw new BizIllegalException(StrUtil.format("用户购物车课程不能超过{}", max));
-        }
+        if (count >= max) throw new BizIllegalException(Code.ITEM_IS_OVERFLOW);
     }
 
     /**

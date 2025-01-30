@@ -1,22 +1,20 @@
 package io.github.caolib.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.caolib.domain.PageDTO;
-import io.github.caolib.domain.PageQuery;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.po.Commodity;
+import io.github.caolib.domain.query.SearchQuery;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 商品管理相关接口
- */
+@Slf4j
 @RestController
 @RequestMapping("/commodity")
 @RequiredArgsConstructor
@@ -29,12 +27,21 @@ public class CommodityController {
      * @param query 分页查询条件
      * @return 分页结果
      */
-    @GetMapping("/page")
-    public PageDTO<CommodityDTO> queryItemByPage(PageQuery query) {
-        // 1.分页查询
-        Page<Commodity> result = commodityService.page(query.toMpPage("update_time", false));
-        // 2.封装并返回
-        return PageDTO.of(result, CommodityDTO.class);
+    //@GetMapping("/page")
+    //@Cacheable(value = Cache.COMMODITY_PAGE, key = "#query")
+    //public PageDTO<CommodityDTO> queryItemByPage(PageQuery query) {
+    //    return commodityService.queryItemByPage(query);
+    //}
+
+    /**
+     * 搜索商品
+     * @param query 商品分页查询条件
+     * @return 分页结果
+     */
+    @GetMapping("/list")
+    public PageDTO<CommodityDTO> search(SearchQuery query) {
+        log.debug("搜索条件: {}", query);
+        return commodityService.pageQuery(query);
     }
 
     /**
@@ -43,8 +50,8 @@ public class CommodityController {
      * @return 商品列表
      */
     @GetMapping
-    public List<CommodityDTO> queryItemByIds(@RequestParam("ids") List<Long> ids) {
-        return commodityService.queryItemByIds(ids);
+    public List<CommodityDTO> getItemByIds(@RequestParam("ids") List<Long> ids) {
+        return commodityService.getItemByIds(ids);
     }
 
     /**
@@ -96,8 +103,8 @@ public class CommodityController {
      * 根据id删除商品
      * @param id 商品id
      */
-    @DeleteMapping("{id}")
-    public void deleteItemById(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public void deleteItemById(@PathVariable Long id) {
         commodityService.removeById(id);
     }
 
@@ -110,6 +117,10 @@ public class CommodityController {
        return commodityService.deductStock(items);
     }
 
+    /**
+     * 批量释放库存
+     * @param dtos 商品列表
+     */
     @PutMapping("/release")
     public void releaseStock(@RequestBody List<OrderDetailDTO> dtos) {
         commodityService.releaseStock(dtos);

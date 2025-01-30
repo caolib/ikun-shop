@@ -7,11 +7,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
- * 支付下单表单实体
+ * 用户下单 表单
  */
 @Data
 @Builder
-public class PayApplyDTO {
+public class PayFormDTO {
     /**
      * 业务订单id不能为空
      */

@@ -4,12 +4,13 @@ import io.github.caolib.enums.E;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 登录表单实体
  */
 @Data
-public class LoginFormDTO {
+public class LoginFormDTO implements Serializable {
     /**
      * 用户名不能为空
      */

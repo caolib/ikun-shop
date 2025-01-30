@@ -1,13 +1,14 @@
 package io.github.caolib.controller;
 
 import io.github.caolib.domain.R;
-import io.github.caolib.domain.dto.PayApplyDTO;
+import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
 import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.enums.PayType;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.service.IPayOrderService;
+import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ import java.util.List;
  * 支付相关接口
  */
 @RestController
-@RequestMapping("pays")
+@RequestMapping("/pays")
 @RequiredArgsConstructor
 public class PayController {
 
@@ -28,7 +29,7 @@ public class PayController {
      */
     @GetMapping
     public List<PayOrderVO> queryPayOrders() {
-        return payOrderService.getUserPayOrders();
+        return payOrderService.getUserPayOrders(UserContext.getUserId());
     }
 
     /**
@@ -38,7 +39,7 @@ public class PayController {
      * @return 返回支付单记录号
      */
     @PostMapping
-    public R<PayOrder> applyPayOrder(@RequestBody PayApplyDTO applyDTO) {
+    public R<PayOrder> applyPayOrder(@RequestBody PayFormDTO applyDTO) {
         if (!PayType.BALANCE.equalsValue(applyDTO.getPayType())) {
             throw new BizIllegalException("目前只支持余额支付");
         }

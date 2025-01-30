@@ -7,6 +7,7 @@ import io.github.caolib.domain.dto.RegisterFormDTO;
 import io.github.caolib.domain.vo.UserInfoVO;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.service.IUserService;
+import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +44,7 @@ public class UserController {
      */
     @PutMapping("/money/deduct")
     public R<String> deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount) {
-        return userService.deductMoney(pw, amount);
+        return userService.deductBalance(pw, amount,UserContext.getUserId());
     }
 
     // 用户注册
@@ -59,7 +60,9 @@ public class UserController {
      */
     @GetMapping
     public R<UserInfoVO> getUserInfo() {
-        return userService.getUserInfo();
+        Long userId = UserContext.getUserId();
+
+        return userService.getUserInfo(userId);
     }
 
     /**
@@ -69,7 +72,7 @@ public class UserController {
     public R<Void> changePassword(@RequestBody PwdFormDTO pwdFormDTO) {
         log.debug("修改密码: {}", pwdFormDTO);
 
-        return userService.changePassword(pwdFormDTO);
+        return userService.changePassword(UserContext.getUserId(),pwdFormDTO);
     }
 
     /**
@@ -77,7 +80,7 @@ public class UserController {
      */
     @DeleteMapping
     public R<Void> cancelAccount(){
-        return userService.cancelAccount();
+        return userService.cancelAccount(UserContext.getUserId());
     }
 
 }

@@ -5,6 +5,7 @@ database:
   password: root
 
 
+
 management:
   endpoints:
     web:

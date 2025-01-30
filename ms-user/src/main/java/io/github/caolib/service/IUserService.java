@@ -14,14 +14,14 @@ public interface IUserService extends IService<User> {
 
     UserLoginVO login(LoginFormDTO loginFormDTO);
 
-    R<String> deductMoney(String pw, Integer totalFee);
+    R<String> deductBalance(String pw, Integer totalFee, Long userId);
 
-    R<UserInfoVO> getUserInfo();
+    R<UserInfoVO> getUserInfo(Long userId);
 
     R<Void> register(RegisterFormDTO registerFormDTO);
 
-    R<Void> changePassword(PwdFormDTO pwdFormDTO);
+    R<Void> changePassword(Long userId,PwdFormDTO pwdFormDTO);
 
-    R<Void> cancelAccount();
+    R<Void> cancelAccount(Long userId);
 
 }
