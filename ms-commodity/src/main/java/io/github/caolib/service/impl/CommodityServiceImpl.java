@@ -98,4 +98,5 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         dtos.forEach(dto -> commodityMapper.recover(dto.getItemId(), dto.getNum()));
     }
 
+
 }

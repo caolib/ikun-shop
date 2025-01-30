@@ -1,7 +1,6 @@
 package io.github.caolib.service.impl;
 
 
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CartClient;
@@ -52,12 +51,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {
-        // 数据校验
         String username = loginDTO.getUsername();
         String password = loginDTO.getPassword();
-        // 根据用户名或手机号查询
+        // 查询用户
         User user = lambdaQuery().eq(User::getUsername, username).one();
-        Assert.notNull(user, "用户不存在"); // 判断用户是否存在
+        // 校验用户是否存在
+        if(user == null) {
+            throw new BadRequestException(Code.USER_NOT_EXIST);
+        }
         // 校验账号状态
         if (user.getStatus() == UserStatus.FROZEN) {
             throw new ForbiddenException(Code.USER_IS_FROZEN);

@@ -13,6 +13,8 @@ import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static io.github.caolib.utils.LogUtil.logErr;
+
 @Slf4j
 @Component
 public class JwtTool {
@@ -48,7 +50,7 @@ public class JwtTool {
         try {
             JWTValidator.of(jwt).validateDate();
         } catch (ValidateException e) {
-            log.error("token已经过期");
+            logErr(e, "token已经过期");
             logDate(jwt); // 打印token过期时间
             throw new UnauthorizedException("token已经过期", 499);
         }
@@ -77,6 +79,6 @@ public class JwtTool {
         SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Integer exp = (Integer) jwt.getPayload("exp");
         Date expiration = new Date(exp.longValue() * 1000);
-        log.debug("token过期时间: {}", DATE_FORMAT.format(expiration));
+        log.warn("token过期时间: {}", DATE_FORMAT.format(expiration));
     }
 }

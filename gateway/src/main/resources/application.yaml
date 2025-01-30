@@ -34,9 +34,7 @@ spring:
           '[/**]':
             allowedOrigins:
               - "https://shop-clb.pages.dev"
-              - "https://shop.caolib.us.kg"
               - "http://localhost:5173"
-              - "http://localhost:18080"
               - http://localhost:1420
             allowedMethods:
               - GET
@@ -57,12 +55,11 @@ shop:
     password: ikun-shop-123456
   auth:
     excludePaths:
-      - /search/**
       - /users/login
       - /users/register
       - /oauth/**
-      - /items/**
       - /**/health
+      - /commodity/home
 
 # 健康状态检查
 management:

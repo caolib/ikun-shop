@@ -18,8 +18,8 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
 
         String path = request.getPath().toString();
         String referer = request.getHeaders().getFirst("Referer");
-        if(!path.endsWith("/health")) {
-            log.debug("[{} <== {}]", path,referer);
+        if (!path.endsWith("/health")) {
+            log.debug("[{} <== {}]", path, referer);
         }
 
         // 放行
@@ -29,6 +29,6 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
     // 过滤器的优先级，数字越小，优先级越高
     @Override
     public int getOrder() {
-        return 100;
+        return -1;
     }
 }
