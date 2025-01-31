@@ -153,11 +153,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .orderByDesc(Order::getCreateTime)
                 .list();
 
+        // 判断订单是否为空
+        if (orders.isEmpty()) {
+            return R.ok(List.of());
+        }
+
         // 转换为VO
         List<OrderVO2> orderVOS = BeanUtils.copyList(orders, OrderVO2.class);
 
         // 获取所有订单id
         List<Long> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
+
 
         // 批量查询订单详情
         List<OrderDetail> allDetails = detailService.lambdaQuery().in(OrderDetail::getOrderId, orderIds).list();
