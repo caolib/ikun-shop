@@ -10,31 +10,35 @@ spring:
         - id: cart
           uri: lb://cart
           predicates:
-            - Path=/carts/**
+            - Path=/carts/**,/cart/**
+
         - id: order
           uri: lb://order
           predicates:
-            - Path=/orders/**
+            - Path=/orders/**,/order/**
+
         - id: user
           uri: lb://user
           predicates:
-            - Path=/users/**,/addresses/**,/oauth/**
+            - Path=/users/**,/addresses/**,/oauth/**,/user/**
           filters:
             - AddRequestHeader=X-Request-red, blue
+
         - id: commodity
           uri: lb://commodity
           predicates:
             - Path=/commodity/**,/search/**
+
         - id: pay
           uri: lb://pay
           predicates:
-            - Path=/pays/**
+            - Path=/pays/**,/pay/**
       globalcors:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "https://shop-clb.pages.dev"
-              - "http://localhost:5173"
+              - https://shop-clb.pages.dev
+              - http://localhost:5173
               - http://localhost:1420
             allowedMethods:
               - GET
@@ -60,11 +64,3 @@ shop:
       - /oauth/**
       - /**/health
       - /commodity/home
-
-# 健康状态检查
-management:
-  endpoints:
-    web:
-      base-path: /
-      path-mapping:
-        health: /gateway/health

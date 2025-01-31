@@ -1,13 +1,11 @@
-# 数据源
-database:
+# mysql
+mysql:
   name: commodity
   host: localhost
   username: root
   password: root
 
-management:
-  endpoints:
-    web:
-      base-path: /
-      path-mapping:
-        health: /commodity/health
+
+spring:
+  redis:
+    database: 1

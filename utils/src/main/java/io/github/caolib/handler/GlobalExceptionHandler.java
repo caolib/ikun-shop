@@ -1,5 +1,6 @@
 package io.github.caolib.handler;
 
+import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
 import io.github.caolib.domain.R;
 import io.github.caolib.exception.CommonException;
 import io.github.caolib.exception.DbException;
@@ -56,8 +57,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UnauthorizedException.class)
     public R<Void> handleUnAuthException(UnauthorizedException e) {
-        //log.error("认证异常 -> ，{}", e.getMessage());
-        //log.debug("", e);
         logErr(e, "认证异常 " + e.getMessage());
         return R.error(e.getCode(), e.getMessage());
     }
@@ -73,6 +72,15 @@ public class GlobalExceptionHandler {
     public Object handleRuntimeException(Exception e) {
         log.error("未知异常 : {}", e.getMessage(), e);
         return processResponse(new CommonException("服务器内部异常", 500));
+    }
+
+    /**
+     * 处理限流异常
+     */
+    @ExceptionHandler(FlowException.class)
+    public ResponseEntity<R<Void>> handleFlowException(FlowException e) {
+        logErr(e, "流量控制");
+        return ResponseEntity.status(429).body(R.error(429, "请求过于频繁，请稍后再试"));
     }
 
 

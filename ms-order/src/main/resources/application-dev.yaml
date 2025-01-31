@@ -1,14 +1,6 @@
-database:
+mysql:
   name: trade
   host: localhost
   port: 3306
   username: root
   password: root
-
-
-management:
-  endpoints:
-    web:
-      base-path: /
-      path-mapping:
-        health: /orders/health

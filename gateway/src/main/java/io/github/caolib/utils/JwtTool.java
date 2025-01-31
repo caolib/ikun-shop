@@ -25,8 +25,7 @@ public class JwtTool {
     }
 
     public Long parseToken(String token) {
-        if (token == null) {
-            log.error("token为空");
+        if (token == null) {;
             throw new UnauthorizedException("未登录");
         }
 

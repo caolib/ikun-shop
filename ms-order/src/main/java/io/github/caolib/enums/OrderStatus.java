@@ -1,4 +1,4 @@
-package io.github.caolib;
+package io.github.caolib.enums;
 
 import lombok.Getter;
 

@@ -2,7 +2,6 @@ package io.github.caolib.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.caolib.OrderStatus;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
 import io.github.caolib.client.PayClient;
@@ -13,6 +12,7 @@ import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.po.OrderDetail;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
 import io.github.caolib.enums.Time;
 import io.github.caolib.exception.BadRequestException;

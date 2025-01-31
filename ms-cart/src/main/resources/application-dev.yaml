@@ -1,16 +1,7 @@
 # 数据源配置
-database:
+mysql:
   name: cart
   host: localhost
   port: 3306
   username: root
   password: root
-cart:
-  max-commodity-num: 3
-
-management:
-  endpoints:
-    web:
-      base-path: /
-      path-mapping:
-        health: /carts/health

@@ -7,13 +7,22 @@ spring:
     nacos:
       server-addr: localhost:8848
       config:
-        extension-configs: yaml
         shared-configs:
           - data-id: datasource.yaml
-          - data-id: logs.yaml
-          - data-id: openfeign.yaml
-          - data-id: sentinel.yaml
-          - data-id: seata.yaml
+            refresh: true
 
-  redis:
-    database: 1
+          - data-id: logs.yaml
+            refresh: true
+
+          - data-id: openfeign.yaml
+            refresh: true
+
+          - data-id: sentinel.yaml
+            refresh: true
+
+          - data-id: seata.yaml
+            refresh: true
+
+          - data-id: status.yaml
+            refresh: true
+            group: DEV_GROUP
