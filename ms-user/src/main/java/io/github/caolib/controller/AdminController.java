@@ -1,4 +1,4 @@
-package io.github.caolib.controller.admin;
+package io.github.caolib.controller;
 
 
 import io.github.caolib.domain.R;

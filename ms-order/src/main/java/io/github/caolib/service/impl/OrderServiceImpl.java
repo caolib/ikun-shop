@@ -1,6 +1,7 @@
 package io.github.caolib.service.impl;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
@@ -11,6 +12,7 @@ import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.po.OrderDetail;
+import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderVO2;
 import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
@@ -106,6 +108,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setId(orderId);
         order.setStatus(OrderStatus.SUCCESS.getCode());
         order.setPayTime(LocalDateTime.now());
+        // TODO 发送延迟消息模拟发货收货等，更新订单时间
         updateById(order);
     }
 
@@ -139,11 +142,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         commodityClient.releaseStock(dtos);
     }
 
+
     /**
      * 获取用户所有订单
      */
     @Override
-    public R<List<OrderVO2>> getUserOrders(Integer status) {
+    public R<List<OrderVO2>> getUserOrders() {
         // 获取用户id
         Long userId = UserContext.getUserId();
 
@@ -163,7 +167,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 获取所有订单id
         List<Long> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
-
 
         // 批量查询订单详情
         List<OrderDetail> allDetails = detailService.lambdaQuery().in(OrderDetail::getOrderId, orderIds).list();
@@ -190,6 +193,26 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .remove();
 
         return R.ok();
+    }
+
+    /**
+     * 分页查询订单
+     *
+     * @param query 查询条件
+     */
+    @Override
+    public Page<Order> getOrderPage(OrderQuery query) {
+        Long id = query.getId();
+        LocalDateTime createTime = query.getCreateTime();
+        LocalDateTime endTime = query.getEndTime();
+        Integer status = query.getStatus();
+
+
+        return lambdaQuery().eq(id != null, Order::getId, id)
+                .eq(status != null, Order::getStatus, status)
+                .ge(createTime != null, Order::getCreateTime, createTime)
+                .le(endTime != null, Order::getEndTime, endTime)
+                .page(query.toPage());
     }
 
 

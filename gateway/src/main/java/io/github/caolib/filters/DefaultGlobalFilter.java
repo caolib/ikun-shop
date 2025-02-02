@@ -18,8 +18,10 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
 
         String path = request.getPath().toString();
         String referer = request.getHeaders().getFirst("Referer");
+        String method = request.getMethodValue(); // 获取请求方法
+
         if (!path.endsWith("/health")) {
-            log.debug("[{} <== {}]", path, referer);
+            log.debug("[{} {} <== {}]",method, path, referer); // 打印请求方法
         }
         // 放行
         return chain.filter(exchange);
