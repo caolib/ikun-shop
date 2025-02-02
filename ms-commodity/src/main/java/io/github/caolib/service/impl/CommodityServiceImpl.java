@@ -38,7 +38,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     @Override
     @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
     public PageDTO<CommodityDTO> pageQuery(SearchQuery q) {
-        // TODO 判断是否是用户 待验证
+        // 判断用户身份
         String identity = UserContext.getIdentity();
         boolean isUser = Auth.USER.equals(identity);
 

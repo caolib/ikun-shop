@@ -18,7 +18,7 @@ public class AdminAspect {
     /**
      * 管理员包下方法执行前校验身份
      */
-    @Before("execution(* io.github.caolib.admin..*(..))")
+    @Before("execution(* io.github.caolib.controller.admin..*(..))")
     public void beforeAdminMethods() {
         String identity = UserContext.getIdentity();
         //log.debug("用户身份：{}", identity);

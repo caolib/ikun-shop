@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 支付相关接口
+ * 支付
  */
 @RestController
 @RequestMapping("/pays")

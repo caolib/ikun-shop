@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 用户相关接口
+ * 用户
  */
 @Slf4j
 @Validated

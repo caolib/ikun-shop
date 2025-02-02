@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 收货地址管理接口
+ * 收货地址
  */
 @Slf4j
 @Validated

@@ -26,6 +26,9 @@ public enum Code {
     PAY_ORDER_NOT_FOUND(1011, "支付单未找到"),
     IDENTITY_ERROR(1012, "身份不符合"),
     COMMODITY_NOT_EXIST(1013, "商品不存在"),
+    USER_ALREADY_FROZEN(1014, "账号已冻结"),
+    USER_ALREADY_NORMAL(1015, "账号已解冻"),
+
     ;
     private final int code;
     private final String message;

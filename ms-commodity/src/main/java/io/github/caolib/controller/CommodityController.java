@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 商品
+ */
 @Slf4j
 @RestController
 @RequestMapping("/commodity")

@@ -1,4 +1,4 @@
-package io.github.caolib.admin;
+package io.github.caolib.controller.admin;
 
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.service.ICommodityService;
@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+/**
+ * 商品管理
+ */
 @Slf4j
 @Validated
 @RestController

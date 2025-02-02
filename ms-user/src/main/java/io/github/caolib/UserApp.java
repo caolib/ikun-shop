@@ -6,8 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-
+@EnableAspectJAutoProxy
 @EnableCaching
 @EnableFeignClients(defaultConfiguration = FeignConfig.class) // 开启openfeign
 @MapperScan(basePackages = "io.github.caolib.mapper")
