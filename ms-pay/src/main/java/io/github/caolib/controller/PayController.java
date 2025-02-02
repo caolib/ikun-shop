@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 支付相关接口
+ * 支付
  */
 @RestController
 @RequestMapping("/pays")
@@ -60,7 +60,7 @@ public class PayController {
     }
 
     /**
-     * 根据业务订单id查询支付单id
+     * 根据订单id查询支付单id
      * @param orderId 业务订单id
      * @return 支付单id
      */
@@ -69,6 +69,10 @@ public class PayController {
         return payOrderService.getPayOrderId(orderId);
     }
 
+    /**
+     * 取消支付单
+     * @param payOrderId 支付单id
+     */
     @PutMapping("/{payOrderId}")
     public void cancelPayOrder(@PathVariable Long payOrderId) {
         payOrderService.cancelPayOrder(payOrderId);

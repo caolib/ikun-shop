@@ -155,7 +155,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
                 .set(PayOrder::getStatus, PayStatus.TRADE_SUCCESS.getValue())
                 .set(PayOrder::getPaySuccessTime, successTime)
                 .eq(PayOrder::getId, id)
-                // 支付状态的乐观锁判断
                 .in(PayOrder::getStatus, PayStatus.NOT_COMMIT.getValue(), PayStatus.WAIT_BUYER_PAY.getValue())
                 .update();
     }

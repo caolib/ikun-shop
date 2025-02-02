@@ -10,10 +10,14 @@ import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 商品
+ */
 @Slf4j
 @RestController
 @RequestMapping("/commodity")
@@ -22,30 +26,35 @@ public class CommodityController {
 
     private final ICommodityService commodityService;
 
+
     /**
-     * 分页查询商品
-     * @param query 分页查询条件
-     * @return 分页结果
+     * 获取主页商品列表
      */
-    //@GetMapping("/page")
-    //@Cacheable(value = Cache.COMMODITY_PAGE, key = "#query")
-    //public PageDTO<CommodityDTO> queryItemByPage(PageQuery query) {
-    //    return commodityService.queryItemByPage(query);
-    //}
+    @GetMapping("/home")
+    public PageDTO<CommodityDTO> getHomeCommodity() {
+        SearchQuery query = new SearchQuery();
+        query.setPageNo(1);
+        query.setPageSize(24);
+
+        return commodityService.pageQuery(query);
+    }
+
 
     /**
      * 搜索商品
+     *
      * @param query 商品分页查询条件
      * @return 分页结果
      */
     @GetMapping("/list")
-    public PageDTO<CommodityDTO> search(SearchQuery query) {
+    public PageDTO<CommodityDTO> search(@Validated SearchQuery query) {
         log.debug("搜索条件: {}", query);
         return commodityService.pageQuery(query);
     }
 
     /**
      * 根据id批量查询商品
+     *
      * @param ids 商品id集合
      * @return 商品列表
      */
@@ -56,6 +65,7 @@ public class CommodityController {
 
     /**
      * 根据id查询商品
+     *
      * @param id 商品id
      * @return 商品信息
      */
@@ -66,6 +76,7 @@ public class CommodityController {
 
     /**
      * 新增商品
+     *
      * @param item 商品信息
      */
     @PostMapping
@@ -76,7 +87,8 @@ public class CommodityController {
 
     /**
      * 更新商品状态
-     * @param id 商品id
+     *
+     * @param id     商品id
      * @param status 商品状态
      */
     @PutMapping("/status/{id}/{status}")
@@ -89,6 +101,7 @@ public class CommodityController {
 
     /**
      * 更新商品
+     *
      * @param item 商品信息
      */
     @PutMapping
@@ -101,6 +114,7 @@ public class CommodityController {
 
     /**
      * 根据id删除商品
+     *
      * @param id 商品id
      */
     @DeleteMapping("/{id}")
@@ -110,15 +124,17 @@ public class CommodityController {
 
     /**
      * 批量扣减库存
+     *
      * @param items 订单详情列表
      */
     @PutMapping("/stock/deduct")
     public R<Void> deductStock(@RequestBody List<OrderDetailDTO> items) {
-       return commodityService.deductStock(items);
+        return commodityService.deductStock(items);
     }
 
     /**
      * 批量释放库存
+     *
      * @param dtos 商品列表
      */
     @PutMapping("/release")

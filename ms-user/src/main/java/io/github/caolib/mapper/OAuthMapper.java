@@ -10,17 +10,17 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface OAuthMapper extends BaseMapper<UserOAuth> {
 
-    @Select("select * from user_oauth where oauth_id = #{oAuthId}")
+    @Select("SELECT * FROM user_oauth WHERE oauth_id = #{oAuthId}")
     UserOAuth selectByOAuthId(String oAuthId);
 
     void addOauthUser(UserOAuth oauthUser);
 
-    @Update("update user_oauth set access_token = #{accessToken} where oauth_id = #{oauthId}")
+    @Update("UPDATE user_oauth SET access_token = #{accessToken} WHERE oauth_id = #{oauthId}")
     void updateAccessToken(Long oauthId, String accessToken);
 
     @Select("SELECT * FROM user_oauth WHERE user_id = #{userId};")
     UserOAuth getByUserId(Long userId);
 
-    @Delete("delete from user_oauth where user_id = #{userId}")
+    @Delete("DELETE FROM user_oauth WHERE user_id = #{userId}")
     void deleteByUserId(Long userId);
 }

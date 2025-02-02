@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static io.github.caolib.utils.LogUtil.logErr;
+
 
 /**
  * sentinel配置
@@ -24,9 +26,10 @@ public class SentinelConfig implements BlockExceptionHandler {
      */
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, BlockException e) throws Exception {
-        log.error(E.FLOW_LIMIT, e);
+        String msg = E.FLOW_LIMIT;
+        logErr(e, msg);
         httpServletResponse.setStatus(429);
-        R<Object> error = R.error(429, E.FLOW_LIMIT);
+        R<Object> error = R.error(429, msg);
         httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.getWriter().write(JSON.toJSONString(error));
     }

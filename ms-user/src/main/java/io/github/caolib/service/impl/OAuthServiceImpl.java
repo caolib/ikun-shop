@@ -7,6 +7,7 @@ import io.github.caolib.domain.po.TokenResponse;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
 import io.github.caolib.domain.vo.UserLoginVO;
+import io.github.caolib.enums.Auth;
 import io.github.caolib.enums.GH;
 import io.github.caolib.exception.GitHubLoginException;
 import io.github.caolib.mapper.OAuthMapper;
@@ -154,7 +155,7 @@ public class OAuthServiceImpl implements OAuthService {
             OAuthMapper.updateAccessToken(oauthId, accessToken);
         }
         // 返回用户信息
-        UserLoginVO vo = jwtTool.setReturnUser(user, avatarUrl);
+        UserLoginVO vo = jwtTool.setReturnUser(user, Auth.USER, avatarUrl);
         return R.ok(vo);
     }
 

@@ -4,13 +4,13 @@ package io.github.caolib.handler;
 import io.github.caolib.domain.R;
 import io.github.caolib.exception.BizIllegalException;
 import io.seata.core.exception.RmTransactionException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@Slf4j
+import static io.github.caolib.utils.LogUtil.logErr;
+
 @RestControllerAdvice
-public class DefaultExceptionHandler {
+public class OrderExceptionHandler {
 
 
     /**
@@ -19,7 +19,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(BizIllegalException.class)
     public R<String> exceptionHandler(BizIllegalException ex) {
         String message = ex.getMessage();
-        log.error("业务异常：{}", message);
+        logErr(ex, message);
         return R.error(message);
     }
 
@@ -29,11 +29,13 @@ public class DefaultExceptionHandler {
      */
     @ExceptionHandler(RmTransactionException.class)
     public R<String> exceptionHandler(RmTransactionException ex) {
-        String message = ex.getMessage();
-        log.error("事务执行失败：{}", message);
+        String msg = ex.getMessage();
+        if (msg.contains("Timeout")) {
+            logErr(ex, "事务执行失败 " + msg);
+            return R.error("请求超时，请稍后再试");
+        }
+        logErr(ex, "事务执行失败 " + msg);
 
-        if (message.contains("Timeout")) return R.error("请求超时，请稍后再试");
-
-        return R.error(message);
+        return R.error(msg);
     }
 }

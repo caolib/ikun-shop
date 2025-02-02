@@ -18,7 +18,9 @@ public enum UserStatus {
         this.desc = desc;
     }
 
-    public static UserStatus of(int value) {
+    public static UserStatus of(Integer value) {
+        if(value == null)
+            return null;
         if (value == 0)
             return FROZEN;
         if (value == 1)

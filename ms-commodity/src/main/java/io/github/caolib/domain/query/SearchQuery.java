@@ -6,21 +6,31 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
 public class SearchQuery implements Serializable {
     @Min(value = 1, message = "页码不能小于1")
+    @NotNull(message = "页码不能为空")
     private Integer pageNo; // 页码
+
     @Min(value = 1, message = "每页查询数量不能小于1")
+    @NotNull(message = "每页查询数量不能为空")
     private Integer pageSize; // 每页大小
+
     private Boolean isAsc = true; // 是否升序
+
     private String sortBy; // 排序字段
 
     private String key; // 搜索关键字
+
     private String category; // 商品分类
+
     private String brand; // 商品品牌
+
     private Integer minPrice; // 价格最小值
+
     private Integer maxPrice; // 价格最大值
 
     // 将当前对象转换为MP的Page对象, 并设置默认排序字段和排序方式

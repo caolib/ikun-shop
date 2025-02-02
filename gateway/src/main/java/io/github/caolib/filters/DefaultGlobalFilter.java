@@ -18,10 +18,11 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
 
         String path = request.getPath().toString();
         String referer = request.getHeaders().getFirst("Referer");
-        if(!path.endsWith("/health")) {
-            log.debug("[{} <== {}]", path,referer);
-        }
+        String method = request.getMethodValue(); // 获取请求方法
 
+        if (!path.endsWith("/health")) {
+            log.debug("[{} {} <== {}]",method, path, referer); // 打印请求方法
+        }
         // 放行
         return chain.filter(exchange);
     }
@@ -29,6 +30,6 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
     // 过滤器的优先级，数字越小，优先级越高
     @Override
     public int getOrder() {
-        return 100;
+        return -1;
     }
 }

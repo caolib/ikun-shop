@@ -7,6 +7,10 @@ spring:
     nacos:
       server-addr: localhost:8848
       config:
-        extension-configs: yaml
         shared-configs:
           - data-id: logs.yaml
+            refresh: true
+
+          - data-id: status.yaml
+            refresh: true
+            group: DEV_GROUP

@@ -1,8 +1,9 @@
 package io.github.caolib.service.impl;
 
 
-import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.config.UserProperties;
@@ -13,12 +14,12 @@ import io.github.caolib.domain.dto.RegisterFormDTO;
 import io.github.caolib.domain.po.Address;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
+import io.github.caolib.domain.query.UserQuery;
 import io.github.caolib.domain.vo.UserInfoVO;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.enums.*;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.BizIllegalException;
-import io.github.caolib.exception.ForbiddenException;
 import io.github.caolib.mapper.AddressMapper;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
@@ -52,29 +53,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {
-        // 数据校验
-        String username = loginDTO.getUsername();
-        String password = loginDTO.getPassword();
-        // 根据用户名或手机号查询
-        User user = lambdaQuery().eq(User::getUsername, username).one();
-        Assert.notNull(user, "用户不存在"); // 判断用户是否存在
-        // 校验账号状态
-        if (user.getStatus() == UserStatus.FROZEN) {
-            throw new ForbiddenException(Code.USER_IS_FROZEN);
-        }
-        // 校验密码
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadRequestException(Code.USERNAME_OR_PASSWORD_ERROR);
-        }
+        // 查询用户
+        User user = lambdaQuery().eq(User::getUsername, loginDTO.getUsername()).one();
+        // 校验用户是否存在
+        if (user == null) throw new BadRequestException(Code.USER_NOT_EXIST);
+        // 校验用户信息
+        jwtTool.checkUser(loginDTO, Auth.USER, user.getStatus(), user.getPassword());
         // 返回用户信息
-        return jwtTool.setReturnUser(user, "");
+        return jwtTool.setReturnUser(user, Auth.USER, "");
     }
 
     /**
      * 扣减用户余额
-     * @param pw 支付密码
+     *
+     * @param pw       支付密码
      * @param totalFee 支付金额
-     * @param userId 用户id
+     * @param userId   用户id
      */
     @Override
     @CacheEvict(value = Cache.USER_INFO, key = "#userId")
@@ -97,6 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 获取用户信息
+     *
      * @param userId 用户id
      */
     @Override
@@ -131,6 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 用户注册
+     *
      * @param registerFormDTO 注册表单
      */
     @Override
@@ -169,12 +165,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 修改密码
-     * @param userId 用户id
+     *
+     * @param userId     用户id
      * @param pwdFormDTO 密码表单
      */
     @Override
     @CacheEvict(value = Cache.USER_INFO, key = "#userId")
-    public R<Void> changePassword(Long userId,PwdFormDTO pwdFormDTO) {
+    public R<Void> changePassword(Long userId, PwdFormDTO pwdFormDTO) {
         // 校验密码
         User user = getById(userId);
         checkPwd(user, pwdFormDTO.getOldPwd());
@@ -220,6 +217,62 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
 
+    /**
+     * 分页查询用户信息
+     *
+     * @param query 查询条件
+     */
+    @Override
+    public R<Page<User>> getUsers(UserQuery query) {
+        Long id = query.getId();
+        String username = query.getUsername();
+        String phone = query.getPhone();
+        Integer status = query.getStatus() == null ? null : query.getStatus();
+        // 分页查询
+        Page<User> page = lambdaQuery()
+                .eq(id != null, User::getId, id)
+                .like(StrUtil.isNotBlank(username), User::getUsername, username)
+                .eq(StrUtil.isNotBlank(phone), User::getPhone, phone)
+                .eq(status != null, User::getStatus, UserStatus.of(status))
+                .page(query.toPage());
+
+        // 删除密码信息
+        page.getRecords().forEach(user -> user.setPassword(null));
+
+        return R.ok(page);
+    }
+
+    @Override
+    public R<Void> freezeUser(Long id) {
+        // 查询用户
+        User user = getById(id);
+        // 校验用户是否存在
+        if (user == null) throw new BadRequestException(Code.USER_NOT_EXIST);
+        // 校验用户状态
+        if (user.getStatus() == UserStatus.FROZEN) throw new BizIllegalException(Code.USER_ALREADY_FROZEN);
+
+        // 冻结用户账号
+        user.setStatus(UserStatus.FROZEN);
+        updateById(user);
+
+        return R.ok();
+    }
+
+    @Override
+    public R<Void> recoverUser(Long id) {
+        // 查询用户
+        User user = getById(id);
+        // 校验用户是否存在
+        if (user == null) throw new BadRequestException(Code.USER_NOT_EXIST);
+        // 校验用户状态
+        if (user.getStatus() == UserStatus.NORMAL) throw new BizIllegalException(Code.USER_ALREADY_NORMAL);
+
+        // 解冻用户账号
+        user.setStatus(UserStatus.NORMAL);
+        updateById(user);
+
+        return R.ok();
+    }
 
 
     /**

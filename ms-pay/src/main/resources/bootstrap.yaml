@@ -7,11 +7,26 @@ spring:
     nacos:
       server-addr: localhost:8848
       config:
-        extension-configs: yaml
+        # 共享配置
         shared-configs:
           - data-id: datasource.yaml
+            refresh: true
+
           - data-id: logs.yaml
+            refresh: true
+
           - data-id: openfeign.yaml
+            refresh: true
+
           - data-id: sentinel.yaml
+            refresh: true
+
           - data-id: seata.yaml
+            refresh: true
+
           - data-id: rabbitmq.yaml
+            refresh: true
+
+          - data-id: status.yaml
+            refresh: true
+            group: DEV_GROUP

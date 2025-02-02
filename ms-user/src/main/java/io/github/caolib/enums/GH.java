@@ -1,5 +1,7 @@
 package io.github.caolib.enums;
 
+
+// TODO 待替换
 public class GH {
     public static final String CLIENT_ID = "Ov23liaxpXWclT4EZOKg";  // GitHub OAuth Client ID
     public static final String CLIENT_SECRET = "15acf8093708070671091ac6c2df939c3e5b4c4b"; // GitHub OAuth Client Secret

@@ -21,5 +21,8 @@ public interface ICommodityService extends IService<Commodity> {
 
     void releaseStock(List<OrderDetailDTO> dtos);
 
+    void updateCommodity(CommodityDTO commodityDTO);
+
+
     //PageDTO<CommodityDTO> queryItemByPage(PageQuery query);
 }

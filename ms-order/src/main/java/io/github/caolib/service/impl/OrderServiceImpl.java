@@ -1,8 +1,8 @@
 package io.github.caolib.service.impl;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.caolib.OrderStatus;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
 import io.github.caolib.client.PayClient;
@@ -12,7 +12,9 @@ import io.github.caolib.domain.dto.OrderDetailDTO;
 import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.po.OrderDetail;
+import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
 import io.github.caolib.enums.Time;
 import io.github.caolib.exception.BadRequestException;
@@ -27,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,6 +108,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setId(orderId);
         order.setStatus(OrderStatus.SUCCESS.getCode());
         order.setPayTime(LocalDateTime.now());
+        // TODO 发送延迟消息模拟发货收货等，更新订单时间
         updateById(order);
     }
 
@@ -116,12 +118,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @param orderId 订单id
      */
     @Override
-    @Transactional
+    @GlobalTransactional
     public void markOrderTimeout(Long orderId) {
         // 取消订单
         orderMapper.markOrderTimeout(orderId, OrderStatus.CLOSED.getCode());
-        // 更新支付单
 
+        // RPC -> 查询支付单
+        Long payOrderId = payClient.getPayOrderByOrderId(orderId).getId();
+        // RPC -> 取消支付单
+        payClient.cancelPayOrder(payOrderId);
 
         // 查询订单详情
         List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();
@@ -137,11 +142,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         commodityClient.releaseStock(dtos);
     }
 
+
     /**
      * 获取用户所有订单
      */
     @Override
-    public R<List<OrderVO2>> getUserOrders(Integer status) {
+    public R<List<OrderVO2>> getUserOrders() {
         // 获取用户id
         Long userId = UserContext.getUserId();
 
@@ -150,6 +156,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .eq(Order::getUserId, userId)
                 .orderByDesc(Order::getCreateTime)
                 .list();
+
+        // 判断订单是否为空
+        if (orders.isEmpty()) {
+            return R.ok(List.of());
+        }
 
         // 转换为VO
         List<OrderVO2> orderVOS = BeanUtils.copyList(orders, OrderVO2.class);
@@ -182,6 +193,26 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .remove();
 
         return R.ok();
+    }
+
+    /**
+     * 分页查询订单
+     *
+     * @param query 查询条件
+     */
+    @Override
+    public Page<Order> getOrderPage(OrderQuery query) {
+        Long id = query.getId();
+        LocalDateTime createTime = query.getCreateTime();
+        LocalDateTime endTime = query.getEndTime();
+        Integer status = query.getStatus();
+
+
+        return lambdaQuery().eq(id != null, Order::getId, id)
+                .eq(status != null, Order::getStatus, status)
+                .ge(createTime != null, Order::getCreateTime, createTime)
+                .le(endTime != null, Order::getEndTime, endTime)
+                .page(query.toPage());
     }
 
 

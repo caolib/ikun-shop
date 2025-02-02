@@ -14,8 +14,10 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // 从请求头中获取用户id
         String userId = request.getHeader(Auth.USER_ID);
-        if (StrUtil.isNotBlank(userId))
-            UserContext.setUserId(Long.valueOf(userId)); // 保存到ThreadLocal中
+        String identity = request.getHeader(Auth.USER_IDENTITY);
+        // 保存到ThreadLocal中
+        if (StrUtil.isNotBlank(userId) && StrUtil.isNotBlank(identity))
+            UserContext.setUser(Long.valueOf(userId), identity);
         return true;
     }
 

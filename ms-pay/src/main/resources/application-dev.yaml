@@ -1,14 +1,6 @@
-database:
+mysql:
   name: pay
   host: localhost
   username: root
   password: root
 
-
-
-management:
-  endpoints:
-    web:
-      base-path: /
-      path-mapping:
-        health: /pays/health

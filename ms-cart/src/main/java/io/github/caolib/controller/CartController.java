@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 购物车相关接口
+ * 购物车
  */
 
 @Slf4j
