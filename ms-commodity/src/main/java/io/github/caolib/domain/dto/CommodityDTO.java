@@ -2,6 +2,7 @@ package io.github.caolib.domain.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 
 /**
@@ -20,10 +21,12 @@ public class CommodityDTO implements Serializable {
     /**
      * 价格（分）
      */
+    @Min(0)
     private Integer price;
     /**
      * 库存数量
      */
+    @Min(0)
     private Integer stock;
     /**
      * 商品图片

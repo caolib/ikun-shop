@@ -6,9 +6,12 @@ import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.exception.GitHubLoginException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
+
+import java.util.stream.Collectors;
 
 import static io.github.caolib.utils.LogUtil.logErr;
 
@@ -54,6 +57,18 @@ public class UserExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public Object handleRuntimeException(IllegalArgumentException e) {
         String msg = e.getMessage();
+        logErr(e, msg);
+        return R.error(msg);
+    }
+
+    /**
+     * 表单参数校验异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String msg = e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining(", "));
         logErr(e, msg);
         return R.error(msg);
     }

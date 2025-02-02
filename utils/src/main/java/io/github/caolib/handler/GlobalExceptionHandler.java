@@ -29,14 +29,6 @@ public class GlobalExceptionHandler {
         return processResponse(e);
     }
 
-    //@ExceptionHandler(MethodArgumentNotValidException.class)
-    //public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-    //    String msg = e.getBindingResult().getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining("|"));
-    //    //log.error("请求参数校验异常 -> {}", msg);
-    //    //log.debug("", e);
-    //    logErr(e, msg);
-    //    return processResponse(new BadRequestException(msg));
-    //}
 
     //@ExceptionHandler(BindException.class)
     //public Object handleBindException(BindException e) {
@@ -68,6 +60,7 @@ public class GlobalExceptionHandler {
     //public R<String> handleConstraintViolationException(ConstraintViolationException ex) {
     //    return R.error(ex.getMessage());
     //}
+
     @ExceptionHandler(Exception.class)
     public Object handleRuntimeException(Exception e) {
         log.error("未知异常 : {}", e.getMessage(), e);

@@ -37,9 +37,11 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
+              - https://dev.shop-clb.pages.dev
               - https://shop-clb.pages.dev
               - http://localhost:5173
               - http://localhost:1420
+              - http://tauri.localhost
             allowedMethods:
               - GET
               - POST
@@ -59,8 +61,8 @@ shop:
     password: ikun-shop-123456
   auth:
     excludePaths:
-      - /users/login
-      - /users/register
+      - /**/login
+      - /**/register
       - /oauth/**
       - /**/health
       - /commodity/home

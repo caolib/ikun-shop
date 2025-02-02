@@ -3,11 +3,13 @@ package io.github.caolib.handler;
 import io.github.caolib.domain.R;
 import io.github.caolib.exception.BizIllegalException;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.github.caolib.utils.LogUtil.logErr;
 
@@ -35,6 +37,18 @@ public class CommodityExceptionHandler {
         );
         logErr(e, errors.toString());
         return R.error("参数异常");
+    }
+
+    /**
+     * 表单参数校验异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String msg = e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        logErr(e, msg);
+        return R.error(msg);
     }
 
 }

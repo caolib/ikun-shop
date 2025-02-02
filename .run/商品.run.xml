@@ -2,7 +2,7 @@
   <configuration default="false" name="商品" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" activateToolWindowBeforeRun="false">
     <module name="ms-commodity" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.CommodityApp" />
-    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED -Dserver.port=9000" />
+    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED -Dserver.port=9001" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.caolib.*" />

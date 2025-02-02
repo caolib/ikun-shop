@@ -5,6 +5,8 @@ import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTValidator;
 import cn.hutool.jwt.signers.JWTSigner;
 import cn.hutool.jwt.signers.JWTSignerUtil;
+import io.github.caolib.domain.dto.UserInfo;
+import io.github.caolib.enums.Auth;
 import io.github.caolib.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,10 +26,9 @@ public class JwtTool {
         this.jwtSigner = JWTSignerUtil.createSigner("rs256", keyPair);
     }
 
-    public Long parseToken(String token) {
-        if (token == null) {;
-            throw new UnauthorizedException("未登录");
-        }
+    public UserInfo parseToken(String token) {
+        // 判断token是否为空
+        if (token == null) throw new UnauthorizedException("未登录");
 
         JWT jwt;
         // 解析token
@@ -35,16 +36,14 @@ public class JwtTool {
             //log.debug("token:{}", token);
             jwt = JWT.of(token).setSigner(jwtSigner);
         } catch (Exception e) {
-            log.error("token解析失败");
+            logErr(e, "token解析失败");
             throw new UnauthorizedException("无效的token", e);
         }
-
-        // 验证token
+        // 验证token有效性
         if (!jwt.verify()) {
             log.error("token无效");
             throw new UnauthorizedException("无效的token");
         }
-
         // 验证token是否过期
         try {
             JWTValidator.of(jwt).validateDate();
@@ -53,20 +52,18 @@ public class JwtTool {
             logDate(jwt); // 打印token过期时间
             throw new UnauthorizedException("token已经过期", 499);
         }
-
-
-        // 获取token中的用户id
-        Object userPayload = jwt.getPayload("user");
-        if (userPayload == null) {
-            log.error("token数载荷为空");
+        // 获取token中的用户信息
+        Object userPayload = jwt.getPayload(Auth.USER_ID);
+        Object userIdentity = jwt.getPayload(Auth.USER_IDENTITY);
+        if (userPayload == null || userIdentity == null) {
+            log.error("token数据载荷为空");
             throw new UnauthorizedException("无效的token");
         }
-
-        // 解析用户id并返回
+        // 尝试解析数据并返回
         try {
-            return Long.valueOf(userPayload.toString());
+            return new UserInfo(Long.valueOf(userPayload.toString()), userIdentity.toString());
         } catch (RuntimeException e) {
-            log.error("token数据载荷有误");
+            logErr(e, "token数据载荷有误");
             throw new UnauthorizedException("无效的token");
         }
     }

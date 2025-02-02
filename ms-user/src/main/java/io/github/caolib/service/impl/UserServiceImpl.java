@@ -17,7 +17,6 @@ import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.enums.*;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.BizIllegalException;
-import io.github.caolib.exception.ForbiddenException;
 import io.github.caolib.mapper.AddressMapper;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
@@ -51,31 +50,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {
-        String username = loginDTO.getUsername();
-        String password = loginDTO.getPassword();
         // 查询用户
-        User user = lambdaQuery().eq(User::getUsername, username).one();
+        User user = lambdaQuery().eq(User::getUsername, loginDTO.getUsername()).one();
         // 校验用户是否存在
-        if(user == null) {
-            throw new BadRequestException(Code.USER_NOT_EXIST);
-        }
-        // 校验账号状态
-        if (user.getStatus() == UserStatus.FROZEN) {
-            throw new ForbiddenException(Code.USER_IS_FROZEN);
-        }
-        // 校验密码
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadRequestException(Code.USERNAME_OR_PASSWORD_ERROR);
-        }
+        if (user == null) throw new BadRequestException(Code.USER_NOT_EXIST);
+        // 校验用户信息
+        jwtTool.checkUser(loginDTO, Auth.USER, user.getStatus(), user.getPassword());
         // 返回用户信息
-        return jwtTool.setReturnUser(user, "");
+        return jwtTool.setReturnUser(user, Auth.USER, "");
     }
 
     /**
      * 扣减用户余额
-     * @param pw 支付密码
+     *
+     * @param pw       支付密码
      * @param totalFee 支付金额
-     * @param userId 用户id
+     * @param userId   用户id
      */
     @Override
     @CacheEvict(value = Cache.USER_INFO, key = "#userId")
@@ -98,6 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 获取用户信息
+     *
      * @param userId 用户id
      */
     @Override
@@ -132,6 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 用户注册
+     *
      * @param registerFormDTO 注册表单
      */
     @Override
@@ -170,12 +162,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 修改密码
-     * @param userId 用户id
+     *
+     * @param userId     用户id
      * @param pwdFormDTO 密码表单
      */
     @Override
     @CacheEvict(value = Cache.USER_INFO, key = "#userId")
-    public R<Void> changePassword(Long userId,PwdFormDTO pwdFormDTO) {
+    public R<Void> changePassword(Long userId, PwdFormDTO pwdFormDTO) {
         // 校验密码
         User user = getById(userId);
         checkPwd(user, pwdFormDTO.getOldPwd());
@@ -219,8 +212,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         return R.ok();
     }
-
-
 
 
     /**

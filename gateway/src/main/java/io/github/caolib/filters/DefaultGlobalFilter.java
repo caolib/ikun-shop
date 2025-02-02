@@ -21,7 +21,6 @@ public class DefaultGlobalFilter implements GlobalFilter, Ordered {
         if (!path.endsWith("/health")) {
             log.debug("[{} <== {}]", path, referer);
         }
-
         // 放行
         return chain.filter(exchange);
     }

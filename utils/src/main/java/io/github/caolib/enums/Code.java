@@ -24,7 +24,8 @@ public enum Code {
     USERNAME_ALREADY_EXIST(1009, "用户名已存在"),
     PHONE_ALREADY_EXIST(1010, "电话已存在"),
     PAY_ORDER_NOT_FOUND(1011, "支付单未找到"),
-
+    IDENTITY_ERROR(1012, "身份不符合"),
+    COMMODITY_NOT_EXIST(1013, "商品不存在"),
     ;
     private final int code;
     private final String message;

@@ -22,7 +22,9 @@ public class LoginFormDTO implements Serializable {
     @NotNull(message = E.PWD_IS_NULL)
     private String password;
     /**
-     * TODO 是否记住我 待删除
+     * 用户身份
      */
-    private Boolean rememberMe = false;
+    @NotNull(message = E.IDENTITY_IS_NULL)
+    private String identity;
+
 }

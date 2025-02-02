@@ -5,6 +5,9 @@ public class E {
     public static final String ORDER_STATUS_EXCEP = "交易已支付或关闭!";
     public static final String USERNAME_IS_NULL = "用户名为空!";
     public static final String PWD_IS_NULL = "密码为空!";
+    public static final String IDENTITY_IS_NULL = "用户身份为空!";
+    public static final String PERMISSIONDENIED = "权限不足!";
+
 
 
     // MQ

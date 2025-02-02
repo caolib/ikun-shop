@@ -1,6 +1,7 @@
 package io.github.caolib.filters;
 
 import io.github.caolib.config.AuthProperties;
+import io.github.caolib.domain.dto.UserInfo;
 import io.github.caolib.enums.Auth;
 import io.github.caolib.exception.UnauthorizedException;
 import io.github.caolib.utils.JwtTool;
@@ -34,20 +35,23 @@ public class LoginFilter implements GlobalFilter, Ordered {
         if (isExcludePath(path.toString())) return chain.filter(exchange);
 
         // 取出请求头中的token
-        String token = request.getHeaders().getFirst("Authorization");
-        Long userId; //用户ID
+        String token = request.getHeaders().getFirst(Auth.KEY);
 
+        UserInfo userInfo;
         try {
-            userId = jwtTool.parseToken(token); // 尝试解析token
+            userInfo = jwtTool.parseToken(token); // 尝试解析token
         } catch (UnauthorizedException e) {
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.UNAUTHORIZED); // 设置状态码为401
             return response.setComplete(); // 拦截请求
         }
 
-        // 将用户ID放入请求头
+        // 将用户信息放入请求头中
+        String userId = userInfo.getUserId().toString();
+        String identity = userInfo.getIdentity();
+
         ServerWebExchange newRequest = exchange.mutate()
-                .request(builder -> builder.header(Auth.USER_ID, userId.toString()))
+                .request(builder -> builder.header(Auth.USER_ID, userId).header(Auth.USER_IDENTITY, identity))
                 .build();
 
         return chain.filter(newRequest); // 放行
