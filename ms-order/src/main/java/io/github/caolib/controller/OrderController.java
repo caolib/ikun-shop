@@ -24,13 +24,11 @@ public class OrderController {
     private final IOrderService orderService;
 
     /**
-     * 获取用户订单 缓存慎用,可以考虑在MQ消息删除对应缓存
-     *
-     * @param status 订单状态
+     * 获取用户订单
      */
     @GetMapping
-    public R<List<OrderVO2>> getUserOrders(Integer status) {
-        return orderService.getUserOrders(status);
+    public R<List<OrderVO2>> getUserOrders() {
+        return orderService.getUserOrders();
     }
 
     /**

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/commodity/admin")
 @RequiredArgsConstructor
-public class ComController {
+public class CommodityManageController {
     private final ICommodityService commodityService;
 
 

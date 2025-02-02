@@ -44,7 +44,7 @@ public class UserController {
      */
     @PutMapping("/money/deduct")
     public R<String> deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount) {
-        return userService.deductBalance(pw, amount,UserContext.getUserId());
+        return userService.deductBalance(pw, amount, UserContext.getUserId());
     }
 
     // 用户注册
@@ -66,20 +66,30 @@ public class UserController {
     }
 
     /**
+     * 根据id获取用户名
+     *
+     * @param id 用户id
+     */
+    @GetMapping("/{id}")
+    UserInfoVO getUserInfoById(@PathVariable Long id) {
+        return userService.getUserInfoById(id);
+    }
+
+    /**
      * 修改密码
      */
     @PutMapping("/pwd")
     public R<Void> changePassword(@RequestBody PwdFormDTO pwdFormDTO) {
         log.debug("修改密码: {}", pwdFormDTO);
 
-        return userService.changePassword(UserContext.getUserId(),pwdFormDTO);
+        return userService.changePassword(UserContext.getUserId(), pwdFormDTO);
     }
 
     /**
      * 注销账户
      */
     @DeleteMapping
-    public R<Void> cancelAccount(){
+    public R<Void> cancelAccount() {
         return userService.cancelAccount(UserContext.getUserId());
     }
 

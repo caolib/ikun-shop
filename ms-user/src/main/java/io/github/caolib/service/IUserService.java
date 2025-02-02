@@ -31,4 +31,6 @@ public interface IUserService extends IService<User> {
     R<Void> freezeUser(Long id);
 
     R<Void> recoverUser(Long id);
+
+    UserInfoVO getUserInfoById(Long id);
 }

@@ -274,6 +274,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return R.ok();
     }
 
+    /**
+     * 根据id获取用户信息
+     * @param id 用户id
+     */
+    @Override
+    public UserInfoVO getUserInfoById(Long id) {
+        User user = getById(id);
+        if (user == null) throw new BizIllegalException(Code.USER_NOT_EXIST);
+
+        return BeanUtils.copyBean(user, UserInfoVO.class);
+    }
+
 
     /**
      * 校验密码
