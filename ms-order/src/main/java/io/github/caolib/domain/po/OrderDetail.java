@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 订单详情
  */
 @Data
-@EqualsAndHashCode(callSuper = false)  // TODO
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("order_detail")
 public class OrderDetail implements Serializable {

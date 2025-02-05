@@ -2,16 +2,22 @@ spring:
   application:
     name: user
   profiles:
-    active: dev
+#    active: dev
+    active: prod
   cloud:
     nacos:
       server-addr: localhost:8848
       config:
         # 拓展配置
         extension-configs:
+          # 用户初始化信息
           - data-id: user-init.yaml
             refresh: true
-            group: DEV_GROUP
+            group: USER_GROUP
+          # github授权登录配置
+          - data-id: github-${spring.profiles.active}.yaml
+            refresh: true
+            group: USER_GROUP
         # 共享配置
         shared-configs:
           - data-id: datasource.yaml

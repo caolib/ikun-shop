@@ -1,12 +1,13 @@
 server:
   port: 9200
+
 spring:
-  application:
-    name: user
+  profiles:
+    active: dev
+  redis:
+    database: 2
   main:
     banner-mode: off
-  redis:
-    database: 0
 shop:
   # jwt令牌校验
   jwt:
@@ -24,3 +25,10 @@ shop:
 # 地址
 addr:
   max-count: 10
+
+# mysql
+mysql:
+  name: user
+  host: localhost
+  username: root
+  password: root

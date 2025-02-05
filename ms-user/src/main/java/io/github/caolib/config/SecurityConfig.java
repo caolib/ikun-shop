@@ -11,7 +11,7 @@ import org.springframework.security.rsa.crypto.KeyStoreKeyFactory;
 import java.security.KeyPair;
 
 @Configuration
-@EnableConfigurationProperties({JwtProperties.class, AuthProperties.class,AddrProperties.class,UserProperties.class})
+@EnableConfigurationProperties({JwtProperties.class, AuthProperties.class,AddrProperties.class,UserProperties.class, GithubProperties.class})
 public class SecurityConfig {
 
     /**

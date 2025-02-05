@@ -86,7 +86,6 @@ public PageDTO<CommodityDTO> homePage(SearchQuery q) {
     @Transactional
     @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
     public R<Void> deductStock(List<OrderDetailDTO> items) {
-        // TODO 待测试
         items.forEach(item -> {
             Commodity commodity = getById(item.getItemId()); // 查询商品
             if (commodity == null || commodity.getStock() < item.getNum()) {  // 库存不足

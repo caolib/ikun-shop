@@ -1,5 +1,6 @@
 package io.github.caolib.service.impl;
 
+import io.github.caolib.config.GithubProperties;
 import io.github.caolib.config.UserProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.po.GitHubUser;
@@ -8,7 +9,6 @@ import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
 import io.github.caolib.domain.vo.UserLoginVO;
 import io.github.caolib.enums.Auth;
-import io.github.caolib.enums.GH;
 import io.github.caolib.exception.GitHubLoginException;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
@@ -35,6 +35,8 @@ import java.net.Proxy;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import static io.github.caolib.utils.LogUtil.logErr;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -43,6 +45,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final UserMapper userMapper;
     private final JwtTool jwtTool;
     private final UserProperties userProperties;
+    private final GithubProperties githubProperties;
 
     /**
      * 获取请求体
@@ -51,16 +54,15 @@ public class OAuthServiceImpl implements OAuthService {
      * @return 请求体
      */
     @NotNull
-    private static HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
+    private HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", "application/json");
-
         // 设置请求体
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", GH.CLIENT_ID);
-        body.add("client_secret", GH.CLIENT_SECRET);
+        body.add("client_id", githubProperties.getClientId());
+        body.add("client_secret", githubProperties.getClientSecret());
         body.add("code", code);
-        body.add("redirect_uri", GH.CALL_BACK_URL); // 确保和 GitHub 应用中的回调 URL 一致
+        body.add("redirect_uri", githubProperties.getCallBackUrl());
 
         return new HttpEntity<>(body, headers);
     }
@@ -83,7 +85,7 @@ public class OAuthServiceImpl implements OAuthService {
         HttpEntity<MultiValueMap<String, String>> requestEntity = getMultiValueMapHttpEntity(code);
         try {
             ResponseEntity<TokenResponse> responseEntity = restTemplate.exchange(
-                    GH.TOKEN_URL,
+                    GithubProperties.TOKEN_URL,
                     HttpMethod.POST,
                     requestEntity,
                     TokenResponse.class
@@ -104,6 +106,10 @@ public class OAuthServiceImpl implements OAuthService {
         }
     }
 
+    /**
+     * 第三方授权登录
+     * @param code 授权码
+     */
     @Override
     @Transactional
     public R<UserLoginVO> login(String code) {
@@ -177,7 +183,7 @@ public class OAuthServiceImpl implements OAuthService {
         // 发送请求
         try {
             ResponseEntity<GitHubUser> responseEntity = restTemplate.exchange(
-                    GH.GITHUB_USER_API_URL,
+                    GithubProperties.GITHUB_USER_API_URL,
                     org.springframework.http.HttpMethod.GET,
                     entity,
                     GitHubUser.class
@@ -185,7 +191,8 @@ public class OAuthServiceImpl implements OAuthService {
             log.debug("{}", responseEntity.getBody());
             return responseEntity.getBody();
         } catch (HttpClientErrorException e) {
-            throw new GitHubLoginException("获取GitHub用户信息失败", 401);
+            logErr(e, e.getMessage());
+            throw new GitHubLoginException();
         }
     }
 }
