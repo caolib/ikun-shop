@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
 import io.github.caolib.client.PayClient;
+import io.github.caolib.client.UserClient;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
@@ -13,7 +14,9 @@ import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.po.OrderDetail;
 import io.github.caolib.domain.query.OrderQuery;
+import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.enums.E;
 import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
 import io.github.caolib.enums.Time;
@@ -47,6 +50,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final IOrderDetailService detailService;
     private final RabbitTemplate rabbitTemplate;
     private final OrderMapper orderMapper;
+    private final UserClient userClient;
 
     @Override
     @GlobalTransactional
@@ -158,9 +162,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .list();
 
         // 判断订单是否为空
-        if (orders.isEmpty()) {
-            return R.ok(List.of());
-        }
+        if (orders.isEmpty()) return R.ok(List.of());
+
 
         // 转换为VO
         List<OrderVO2> orderVOS = BeanUtils.copyList(orders, OrderVO2.class);
@@ -213,6 +216,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .ge(createTime != null, Order::getCreateTime, createTime)
                 .le(endTime != null, Order::getEndTime, endTime)
                 .page(query.toPage());
+    }
+
+    /**
+     * 删除订单
+     * @param id 订单id
+     */
+    @Override
+    public void deleteOrder(Long id) {
+        if (!removeById(id))
+            throw new BadRequestException(E.ORDER_NOT_EXIST);
+    }
+
+    @Override
+    public OrderDetailVO getOrderDetail(Long id) {
+        // 查询订单
+        Order order = getById(id);
+        if (order == null) throw new BadRequestException(E.ORDER_NOT_EXIST);
+        // 获取用户名
+        userClient.getUserInfoById(order.getUserId());
+        // 查询订单商品
+        List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, id).list();
+
+        // 装换为VO
+        OrderDetailVO detailVO = BeanUtils.copyBean(order, OrderDetailVO.class);
+        detailVO.setOrderDetails(details);
+
+        return detailVO;
     }
 
 

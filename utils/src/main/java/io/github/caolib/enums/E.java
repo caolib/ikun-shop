@@ -7,6 +7,7 @@ public class E {
     public static final String PWD_IS_NULL = "密码为空!";
     public static final String IDENTITY_IS_NULL = "用户身份为空!";
     public static final String PERMISSIONDENIED = "权限不足!";
+    public static final String ORDER_NOT_EXIST = "订单不存在!";
 
 
 

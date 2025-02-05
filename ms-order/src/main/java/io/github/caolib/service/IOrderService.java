@@ -7,6 +7,7 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.query.OrderQuery;
+import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
 
 import java.util.List;
@@ -24,4 +25,8 @@ public interface IOrderService extends IService<Order> {
     void markOrderTimeout(Long orderId);
 
     Page<Order> getOrderPage(OrderQuery query);
+
+    void deleteOrder(Long id);
+
+    OrderDetailVO getOrderDetail(Long id);
 }

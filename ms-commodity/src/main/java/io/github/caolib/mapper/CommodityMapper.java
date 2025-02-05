@@ -17,4 +17,6 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
 
     @Update("UPDATE commodity SET stock = stock + #{num} WHERE id = #{itemId}")
     void recover(Long itemId, Integer num);
+
+
 }

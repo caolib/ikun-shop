@@ -1,5 +1,6 @@
 package io.github.caolib.aspect;
 
+
 import io.github.caolib.enums.Auth;
 import io.github.caolib.enums.E;
 import io.github.caolib.exception.ForbiddenException;
@@ -27,10 +28,10 @@ public class AdminAspect {
     @Before("adminMethods()")
     public void beforeAdminMethods() {
         String identity = UserContext.getIdentity();
-        log.debug("用户身份：{}", identity);
 
         // 管理员权限校验
         if (!Auth.ADMIN.equals(identity)) {
+            log.debug("用户身份：{}", identity);
             throw new ForbiddenException(E.PERMISSIONDENIED);
         }
     }

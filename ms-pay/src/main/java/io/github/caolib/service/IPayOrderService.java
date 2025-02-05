@@ -25,4 +25,6 @@ public interface IPayOrderService extends IService<PayOrder> {
     List<PayOrderVO> getUserPayOrders(Long userId);
 
     void cancelPayOrder(Long payOrderId);
+
+    //Page<PayOrder> getPayOrderPage(PayOrderQuery query);
 }

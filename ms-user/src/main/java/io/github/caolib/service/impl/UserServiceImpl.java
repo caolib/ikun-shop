@@ -11,6 +11,7 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.LoginFormDTO;
 import io.github.caolib.domain.dto.PwdFormDTO;
 import io.github.caolib.domain.dto.RegisterFormDTO;
+import io.github.caolib.domain.dto.UserDTO;
 import io.github.caolib.domain.po.Address;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.po.UserOAuth;
@@ -27,6 +28,7 @@ import io.github.caolib.service.IUserService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.JwtTool;
 import io.github.caolib.utils.PhoneUtil;
+import io.github.caolib.utils.TimeUtil;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -272,6 +274,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         updateById(user);
 
         return R.ok();
+    }
+
+    /**
+     * 根据id获取用户信息
+     *
+     * @param id 用户id
+     */
+    @Override
+    public UserInfoVO getUserInfoById(Long id) {
+        User user = getById(id);
+        if (user == null) throw new BizIllegalException(Code.USER_NOT_EXIST);
+
+        return BeanUtils.copyBean(user, UserInfoVO.class);
+    }
+
+    @Override
+    public void updateUser(UserDTO user) {
+        // 设置更新时间
+        user.setUpdateTime(TimeUtil.now());
+
+        userMapper.updateUser(user);
     }
 
 

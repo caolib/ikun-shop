@@ -1,7 +1,6 @@
 package io.github.caolib.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -73,12 +72,6 @@ public class Commodity implements Serializable {
     private Integer commentCount;
 
     /**
-     * 是否是推广广告，true/false
-     */
-    @TableField("isAD")
-    private Boolean isAD;
-
-    /**
      * 商品状态 1-正常，2-下架，3-删除
      */
     private Integer status;
@@ -96,7 +89,7 @@ public class Commodity implements Serializable {
     /**
      * 创建人
      */
-    private Long creater;
+    private Long creator;
 
     /**
      * 修改人

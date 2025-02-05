@@ -23,6 +23,8 @@ public interface ICommodityService extends IService<Commodity> {
 
     void updateCommodity(CommodityDTO commodityDTO);
 
+    PageDTO<CommodityDTO> homePage(SearchQuery query);
+
 
     //PageDTO<CommodityDTO> queryItemByPage(PageQuery query);
 }
