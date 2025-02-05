@@ -3,6 +3,7 @@ package io.github.caolib.controller.admin;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.caolib.domain.R;
+import io.github.caolib.domain.dto.UserDTO;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.query.UserQuery;
 import io.github.caolib.service.IUserService;
@@ -52,6 +53,17 @@ public class UserManageController {
     @PutMapping("/recover/{id}")
     public R<Void> unfreezeUser(@PathVariable Long id) {
         return userService.recoverUser(id);
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param user 用户信息
+     */
+    @PutMapping
+    public void updateUser(@RequestBody UserDTO user) {
+        //log.debug("update user: {}", user);
+        userService.updateUser(user);
     }
 
 }

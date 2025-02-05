@@ -1,65 +1,16 @@
 server:
   port: 8080
 spring:
-  application:
-    name: gateway
-  cloud:
-    gateway:
-      # 路由规则
-      routes:
-        - id: cart
-          uri: lb://cart
-          predicates:
-            - Path=/carts/**,/cart/**
-
-        - id: order
-          uri: lb://order
-          predicates:
-            - Path=/orders/**,/order/**
-
-        - id: user
-          uri: lb://user
-          predicates:
-            - Path=/users/**,/addresses/**,/oauth/**,/user/**
-          filters:
-            - AddRequestHeader=X-Request-red, blue
-
-        - id: commodity
-          uri: lb://commodity
-          predicates:
-            - Path=/commodity/**,/search/**
-
-        - id: pay
-          uri: lb://pay
-          predicates:
-            - Path=/pays/**,/pay/**
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - https://dev.shop-clb.pages.dev
-              - https://shop-clb.pages.dev
-              - http://localhost:5173
-              - http://localhost:1420
-              - http://tauri.localhost
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders:
-              - "*"
-            allowCredentials: true
   main:
-    banner-mode: off
-# 密钥校验信息
+    banner-mode: off # 关闭启动时的logo
 shop:
+  # 密钥校验信息
   jwt:
     location: classpath:key.jks
     alias: ikun
     password: ikun-shop-123456
   auth:
+    # 无需校验身份的路径
     excludePaths:
       - /**/login
       - /**/register

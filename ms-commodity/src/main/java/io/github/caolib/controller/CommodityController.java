@@ -36,7 +36,7 @@ public class CommodityController {
         query.setPageNo(1);
         query.setPageSize(24);
 
-        return commodityService.pageQuery(query);
+        return commodityService.homePage(query);
     }
 
 

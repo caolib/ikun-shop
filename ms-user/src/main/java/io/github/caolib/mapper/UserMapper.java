@@ -1,6 +1,7 @@
 package io.github.caolib.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.caolib.domain.dto.UserDTO;
 import io.github.caolib.domain.po.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,4 +25,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Update("UPDATE user SET password = #{pwd} WHERE id = #{userId}")
     void updatePwd(Long userId, String pwd);
+
+    @Update("UPDATE user SET username = #{username}, phone = #{phone},update_time = #{updateTime} WHERE id = #{id}")
+    void updateUser(UserDTO user);
 }

@@ -8,6 +8,10 @@ spring:
       server-addr: localhost:8848
       config:
         shared-configs:
+          - data-id: gateway.yaml
+            refresh: true
+            group: DEV_GROUP
+
           - data-id: logs.yaml
             refresh: true
 

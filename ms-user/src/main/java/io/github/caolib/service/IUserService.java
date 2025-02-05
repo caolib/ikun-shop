@@ -7,6 +7,7 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.LoginFormDTO;
 import io.github.caolib.domain.dto.PwdFormDTO;
 import io.github.caolib.domain.dto.RegisterFormDTO;
+import io.github.caolib.domain.dto.UserDTO;
 import io.github.caolib.domain.po.User;
 import io.github.caolib.domain.query.UserQuery;
 import io.github.caolib.domain.vo.UserInfoVO;
@@ -22,7 +23,7 @@ public interface IUserService extends IService<User> {
 
     R<Void> register(RegisterFormDTO registerFormDTO);
 
-    R<Void> changePassword(Long userId,PwdFormDTO pwdFormDTO);
+    R<Void> changePassword(Long userId, PwdFormDTO pwdFormDTO);
 
     R<Void> cancelAccount(Long userId);
 
@@ -33,4 +34,6 @@ public interface IUserService extends IService<User> {
     R<Void> recoverUser(Long id);
 
     UserInfoVO getUserInfoById(Long id);
+
+    void updateUser(UserDTO user);
 }

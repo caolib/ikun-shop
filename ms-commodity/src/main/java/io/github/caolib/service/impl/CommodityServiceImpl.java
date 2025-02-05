@@ -35,6 +35,21 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
 
     private final CommodityMapper commodityMapper;
 
+@Override
+public PageDTO<CommodityDTO> homePage(SearchQuery q) {
+    // 判断用户身份
+    String identity = UserContext.getIdentity();
+    boolean isUser = Auth.USER.equals(identity);
+
+    // 分页查询
+    Page<Commodity> result = lambdaQuery()
+            .eq(isUser, Commodity::getStatus, 1)
+            .last("ORDER BY RAND()") // 随机排序
+            .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
+
+    return PageDTO.of(result, CommodityDTO.class);
+}
+
     @Override
     @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
     public PageDTO<CommodityDTO> pageQuery(SearchQuery q) {
@@ -129,6 +144,8 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
 
         updateById(commodity);
     }
+
+
 
 
 }
