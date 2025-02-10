@@ -5,10 +5,7 @@ import io.github.caolib.service.ICommodityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -33,6 +30,16 @@ public class CommodityManageController {
         log.debug("更新商品信息 {}", commodityDTO);
 
         commodityService.updateCommodity(commodityDTO);
+    }
+
+    /**
+     * 新增商品
+     *
+     * @param commodity 商品信息
+     */
+    @PostMapping
+    public void saveItem(@RequestBody CommodityDTO commodity) {
+        commodityService.addCommodity(commodity);
     }
 
 

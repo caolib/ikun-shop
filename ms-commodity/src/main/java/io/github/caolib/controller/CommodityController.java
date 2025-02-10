@@ -74,16 +74,16 @@ public class CommodityController {
         return BeanUtils.copyBean(commodityService.getById(id), CommodityDTO.class);
     }
 
-    /**
-     * 新增商品
-     *
-     * @param item 商品信息
-     */
-    @PostMapping
-    public void saveItem(@RequestBody CommodityDTO item) {
-        // 新增
-        commodityService.save(BeanUtils.copyBean(item, Commodity.class));
-    }
+    ///**
+    // * 新增商品
+    // *
+    // * @param item 商品信息
+    // */
+    //@PostMapping
+    //public void saveItem(@RequestBody CommodityDTO commodity) {
+    //    commodityService.save(BeanUtils.copyBean(commodity, Commodity.class));
+    //    //commodityService.addCommodity(commodity);
+    //}
 
     /**
      * 更新商品状态

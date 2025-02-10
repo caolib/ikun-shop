@@ -18,9 +18,9 @@ import io.github.caolib.mapper.CommodityMapper;
 import io.github.caolib.service.ICommodityService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.CollUtils;
-import io.github.caolib.utils.TimeUtil;
 import io.github.caolib.utils.UserContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,26 +29,48 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 
+import static io.github.caolib.utils.TimeUtil.now;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity> implements ICommodityService {
 
     private final CommodityMapper commodityMapper;
 
-@Override
-public PageDTO<CommodityDTO> homePage(SearchQuery q) {
-    // 判断用户身份
-    String identity = UserContext.getIdentity();
-    boolean isUser = Auth.USER.equals(identity);
+    @Override
+    public PageDTO<CommodityDTO> homePage(SearchQuery q) {
+        // 判断用户身份
+        String identity = UserContext.getIdentity();
+        boolean isUser = Auth.USER.equals(identity);
 
-    // 分页查询
-    Page<Commodity> result = lambdaQuery()
-            .eq(isUser, Commodity::getStatus, 1)
-            .last("ORDER BY RAND()") // 随机排序
-            .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
+        // 分页查询
+        Page<Commodity> result = lambdaQuery()
+                .eq(isUser, Commodity::getStatus, 1)
+                .last("ORDER BY RAND()") // 随机排序
+                .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
 
-    return PageDTO.of(result, CommodityDTO.class);
-}
+        return PageDTO.of(result, CommodityDTO.class);
+    }
+
+    @Override
+    public void addCommodity(CommodityDTO commodity) {
+        Long userId = UserContext.getUserId();
+        Commodity c = BeanUtils.copyBean(commodity, Commodity.class);
+
+        // 查询商品是否存在
+        Commodity exist = lambdaQuery().eq(Commodity::getName, c.getName()).one();
+        if (exist != null) {
+            throw new BizIllegalException(Code.COMMODITY_ALREADY_EXIST);
+        }
+
+        c.setCreateTime(now());
+        c.setUpdateTime(now());
+        c.setUpdater(userId);
+        c.setCreator(userId);
+
+        save(c);
+    }
 
     @Override
     @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
@@ -69,10 +91,12 @@ public PageDTO<CommodityDTO> homePage(SearchQuery q) {
                 .eq(StrUtil.isNotBlank(brand), Commodity::getBrand, brand)
                 .eq(StrUtil.isNotBlank(category), Commodity::getCategory, category)
                 .eq(isUser, Commodity::getStatus, 1)
+                .in(!isUser, Commodity::getStatus, 1, 2)
                 .ge(minPrice != null, Commodity::getPrice, minPrice)
                 .le(maxPrice != null, Commodity::getPrice, maxPrice)
                 .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
         // 封装并返回
+        log.debug("分页查询结果: {}", PageDTO.of(result, CommodityDTO.class));
         return PageDTO.of(result, CommodityDTO.class);
     }
 
@@ -138,13 +162,11 @@ public PageDTO<CommodityDTO> homePage(SearchQuery q) {
 
         // 更新商品信息
         Commodity commodity = BeanUtils.copyBean(commodityDTO, Commodity.class);
-        commodity.setUpdateTime(TimeUtil.now());
+        commodity.setUpdateTime(now());
         commodity.setUpdater(UserContext.getUserId());
 
         updateById(commodity);
     }
-
-
 
 
 }

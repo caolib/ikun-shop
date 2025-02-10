@@ -33,11 +33,11 @@ public class CommodityDTO implements Serializable {
      */
     private String image;
     /**
-     * 类目名称
+     * 分类
      */
     private String category;
     /**
-     * 品牌名称
+     * 品牌
      */
     private String brand;
     /**
@@ -47,10 +47,12 @@ public class CommodityDTO implements Serializable {
     /**
      * 销量
      */
+    @Min(0)
     private Integer sold;
     /**
      * 评论数
      */
+    @Min(0)
     private Integer commentCount;
     /**
      * 是否是推广广告，true/false
