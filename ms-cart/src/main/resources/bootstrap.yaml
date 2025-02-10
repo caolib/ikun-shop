@@ -11,7 +11,7 @@ spring:
         extension-configs:
           - data-id: cart.yaml
             refresh: true
-            group: DEV_GROUP
+            group: CART_GROUP
         # 共享配置
         shared-configs:
           - data-id: datasource.yaml
