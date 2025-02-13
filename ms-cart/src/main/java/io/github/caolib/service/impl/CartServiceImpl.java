@@ -89,12 +89,13 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     @Override
     @Transactional
     public void removeByItemIds(Collection<Long> ids) {
-        // 1.构建删除条件，userId和itemId
+        if (ids.isEmpty()) return;
+        // 构建删除条件，userId和itemId
         QueryWrapper<Cart> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(Cart::getUserId, UserContext.getUserId())
                 .in(Cart::getItemId, ids);
-        // 2.删除
+        // 删除
         remove(queryWrapper);
     }
 

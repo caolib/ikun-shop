@@ -25,16 +25,14 @@ import io.github.caolib.mapper.AddressMapper;
 import io.github.caolib.mapper.OAuthMapper;
 import io.github.caolib.mapper.UserMapper;
 import io.github.caolib.service.IUserService;
-import io.github.caolib.utils.BeanUtils;
-import io.github.caolib.utils.JwtTool;
-import io.github.caolib.utils.PhoneUtil;
-import io.github.caolib.utils.TimeUtil;
+import io.github.caolib.utils.*;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final RabbitTemplate rabbitTemplate;
     private final CartClient cartClient;
     private final AddressMapper addressMapper;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {
@@ -295,6 +294,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setUpdateTime(TimeUtil.now());
 
         userMapper.updateUser(user);
+    }
+
+    /**
+     * 退出登录，将redis中保存的令牌清除
+     */
+    @Override
+    public void logout() {
+        Long userId = UserContext.getUserId();
+        Boolean delete = redisTemplate.delete(userId.toString());
+        if(Boolean.TRUE.equals(delete)){
+            log.debug("用户退出登录，userId:{}", userId);
+        }
     }
 
 

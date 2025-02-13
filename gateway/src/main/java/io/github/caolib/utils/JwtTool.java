@@ -7,8 +7,10 @@ import cn.hutool.jwt.signers.JWTSigner;
 import cn.hutool.jwt.signers.JWTSignerUtil;
 import io.github.caolib.domain.dto.UserInfo;
 import io.github.caolib.enums.Auth;
+import io.github.caolib.enums.Code;
 import io.github.caolib.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
@@ -21,11 +23,18 @@ import static io.github.caolib.utils.LogUtil.logErr;
 @Component
 public class JwtTool {
     private final JWTSigner jwtSigner;
+    private final StringRedisTemplate redisTemplate;
 
-    public JwtTool(KeyPair keyPair) {
+    public JwtTool(KeyPair keyPair, StringRedisTemplate redisTemplate) {
         this.jwtSigner = JWTSignerUtil.createSigner("rs256", keyPair);
+        this.redisTemplate = redisTemplate;
     }
 
+    /**
+     * 解析token
+     *
+     * @param token token
+     */
     public UserInfo parseToken(String token) {
         // 判断token是否为空
         if (token == null) throw new UnauthorizedException("未登录");
@@ -39,6 +48,7 @@ public class JwtTool {
             logErr(e, "token解析失败");
             throw new UnauthorizedException("无效的token", e);
         }
+
         // 验证token有效性
         if (!jwt.verify()) {
             log.error("token无效");
@@ -50,7 +60,7 @@ public class JwtTool {
         } catch (ValidateException e) {
             logErr(e, "token已经过期");
             logDate(jwt); // 打印token过期时间
-            throw new UnauthorizedException("token已经过期", 499);
+            throw new UnauthorizedException(Code.TOKEN_EXPIRED);
         }
         // 获取token中的用户信息
         Object userPayload = jwt.getPayload(Auth.USER_ID);
@@ -61,7 +71,16 @@ public class JwtTool {
         }
         // 尝试解析数据并返回
         try {
-            return new UserInfo(Long.valueOf(userPayload.toString()), userIdentity.toString());
+            Long userId = Long.valueOf(userPayload.toString());
+            String identity = userIdentity.toString();
+            // 如果redis中没有token，说明token已经过期
+            log.debug("userId:{}", userId);
+            String storeToken = redisTemplate.opsForValue().get(userId.toString());
+            if (storeToken == null) throw new UnauthorizedException(Code.TOKEN_EXPIRED); // token已经过期
+            // 返回用户信息
+            return new UserInfo(userId, identity);
+        } catch (UnauthorizedException e) {
+            throw e;
         } catch (RuntimeException e) {
             logErr(e, "token数据载荷有误");
             throw new UnauthorizedException("无效的token");

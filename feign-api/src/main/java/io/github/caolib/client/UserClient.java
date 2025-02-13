@@ -17,7 +17,7 @@ public interface UserClient {
      * @param amount 金额
      */
     @PutMapping("/money/deduct")
-    R<String> deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount);
+    R<String> deductMoney(@RequestParam String pw, @RequestParam Integer amount, @RequestParam Long userId);
 
     /**
      * 根据id获取用户名

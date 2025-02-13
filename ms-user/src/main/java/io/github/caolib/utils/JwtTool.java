@@ -13,6 +13,8 @@ import io.github.caolib.enums.Code;
 import io.github.caolib.enums.UserStatus;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.exception.ForbiddenException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -20,33 +22,40 @@ import java.security.KeyPair;
 import java.time.Duration;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtTool {
     private final JWTSigner jwtSigner;
     private final JwtProperties jwtProperties;
     private final PasswordEncoder passwordEncoder;
+    private final StringRedisTemplate redisTemplate;
 
 
-    public JwtTool(KeyPair keyPair, JwtProperties jwtProperties, PasswordEncoder passwordEncoder) {
+    public JwtTool(KeyPair keyPair, JwtProperties jwtProperties, PasswordEncoder passwordEncoder, StringRedisTemplate redisTemplate) {
         this.jwtSigner = JWTSignerUtil.createSigner("rs256", keyPair);
         this.jwtProperties = jwtProperties;
         this.passwordEncoder = passwordEncoder;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
-     * 创建jwt token
+     * 生成令牌
      *
      * @param userId   用户id
      * @param identity 用户身份
      * @param ttl      token有效期
      */
     public String createToken(Long userId, String identity, Duration ttl) {
-        return JWT.create()
+        String token = JWT.create()
                 .setPayload(Auth.USER_ID, userId)
                 .setPayload(Auth.USER_IDENTITY, identity)
                 .setExpiresAt(new Date(System.currentTimeMillis() + ttl.toMillis()))
                 .setSigner(jwtSigner)
                 .sign();
+        // 将令牌保存到redis
+        redisTemplate.opsForValue().set(userId.toString(), token, ttl);
+
+        return token;
     }
 
     /**
@@ -68,7 +77,7 @@ public class JwtTool {
     }
 
     /**
-     * 设置登录返回的用户信息
+     * 设置登录返回的管理员信息
      *
      * @param admin     管理员
      * @param avatarUrl 头像
@@ -87,7 +96,7 @@ public class JwtTool {
     /**
      * 校验用户信息
      */
-    public  void checkUser(LoginFormDTO loginDTO, String identity, UserStatus status, String pwd) {
+    public void checkUser(LoginFormDTO loginDTO, String identity, UserStatus status, String pwd) {
         // 校验用户身份
         if (!loginDTO.getIdentity().equals(identity)) throw new BadRequestException(Code.IDENTITY_ERROR);
         // 校验账号状态

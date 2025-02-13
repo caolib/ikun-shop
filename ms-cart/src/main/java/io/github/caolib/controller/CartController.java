@@ -41,7 +41,7 @@ public class CartController {
      */
     @PostMapping
     public void addItem2Cart(@Valid @RequestBody CartFormDTO cartFormDTO) {
-        cartService.addToCart(UserContext.getUserId(),cartFormDTO);
+        cartService.addToCart(UserContext.getUserId(), cartFormDTO);
     }
 
     /**
@@ -56,7 +56,8 @@ public class CartController {
 
     /**
      * 更新购物车中商品数量
-     * @param id 购物车条目id
+     *
+     * @param id  购物车条目id
      * @param num 商品数量
      */
     @PutMapping("/{id}/{num}")
@@ -72,6 +73,7 @@ public class CartController {
      */
     @DeleteMapping("/{id}")
     public void deleteCartItem(@PathVariable("id") Long id) {
+        if (id == null) return;
         cartService.removeById(id);
     }
 
@@ -92,13 +94,14 @@ public class CartController {
      */
     @DeleteMapping("/batch")
     public void deleteBatchCartItem(@RequestBody List<Long> ids) {
+        if (ids.isEmpty()) return;
         cartService.removeBatchByIds(ids);
     }
 
     @DeleteMapping("/cancel/{userId}")
     public R<Void> deleteCartByUserId(@PathVariable Long userId) {
         //log.debug("删除用户 {} 的购物车信息", userId);
-       return cartService.deleteByUserId(userId);
+        return cartService.deleteByUserId(userId);
     }
 
 

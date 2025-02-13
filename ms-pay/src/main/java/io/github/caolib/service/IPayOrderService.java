@@ -7,6 +7,7 @@ import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
 import io.github.caolib.domain.vo.PayOrderVO;
+import io.github.caolib.domain.vo.PayStatisticVO;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface IPayOrderService extends IService<PayOrder> {
     List<PayOrderVO> getUserPayOrders(Long userId);
 
     void cancelPayOrder(Long payOrderId);
+
+    R<List<PayStatisticVO>> weekStatistic();
 
     //Page<PayOrder> getPayOrderPage(PayOrderQuery query);
 }

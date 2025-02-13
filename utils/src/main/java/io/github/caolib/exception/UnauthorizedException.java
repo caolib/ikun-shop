@@ -1,12 +1,18 @@
 package io.github.caolib.exception;
 
-public class UnauthorizedException extends CommonException{
+import io.github.caolib.enums.Code;
+
+public class UnauthorizedException extends CommonException {
 
     public UnauthorizedException(String message) {
         super(message, 401);
     }
 
-    public UnauthorizedException(String message,int code) {
+    public UnauthorizedException(Code code) {
+        super(code.getMessage(), code.getCode());
+    }
+
+    public UnauthorizedException(String message, int code) {
         super(message, code);
     }
 

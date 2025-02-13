@@ -96,7 +96,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // MQ -> 发送延迟消息，标记订单状态 [超时/已支付]
         rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(Time.TIMEOUT.intValue()));
         //rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(20000));
-        log.debug("<发送延迟消息，检查订单是否支付 --> MQ orderId:{}>", order.getId());
+        log.debug("<发送延迟消息，标记订单状态 [超时/已支付] --> MQ orderId:{}>", order.getId());
 
         return order.getId();
     }

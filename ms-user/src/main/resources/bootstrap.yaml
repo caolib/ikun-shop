@@ -2,8 +2,8 @@ spring:
   application:
     name: user
   profiles:
-#    active: dev
-    active: prod
+    active: dev
+#    active: prod
   cloud:
     nacos:
       server-addr: localhost:8848
