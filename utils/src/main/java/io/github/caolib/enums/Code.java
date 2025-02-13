@@ -29,7 +29,8 @@ public enum Code {
     USER_ALREADY_FROZEN(1014, "账号已冻结"),
     USER_ALREADY_NORMAL(1015, "账号已解冻"),
 
-    COMMODITY_ALREADY_EXIST(1016, "商品已经存在");
+    COMMODITY_ALREADY_EXIST(1016, "商品已经存在"),
+    TOKEN_EXPIRED(499,"登录信息已过期" );
     private final int code;
     private final String message;
 

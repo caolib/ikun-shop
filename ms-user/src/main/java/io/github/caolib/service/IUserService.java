@@ -36,4 +36,7 @@ public interface IUserService extends IService<User> {
     UserInfoVO getUserInfoById(Long id);
 
     void updateUser(UserDTO user);
+
+    void logout();
+
 }
