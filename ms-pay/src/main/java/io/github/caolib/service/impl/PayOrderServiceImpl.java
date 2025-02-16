@@ -10,6 +10,7 @@ import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
 import io.github.caolib.domain.vo.PayOrderVO;
+import io.github.caolib.domain.vo.PayStatisticVO;
 import io.github.caolib.enums.*;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.PayOrderMapper;
@@ -23,6 +24,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -67,6 +69,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
     /**
      * 创建支付单
+     *
      * @param payForm 用户下单表单
      */
     @Override
@@ -79,6 +82,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
     /**
      * 使用用户余额支付
+     *
      * @param payOrderFormDTO 支付订单表单数据传输对象
      */
     @Override
@@ -95,7 +99,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             throw new BizIllegalException(errorMsg);
         }
         // RPC --> 扣减用户余额
-        R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
+        R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount(),UserContext.getUserId());
         //log.debug("扣减用户余额结果：{}", res);
         if (res.getCode() != 200) {
             throw new BizIllegalException(res.getMsg(), res.getCode());// 扣减余额失败
@@ -118,7 +122,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
 
-
     /**
      * 根据用户id删除支付单
      *
@@ -128,7 +131,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     public void deleteByUserId(Long userId) {
         payOrderMapper.updatePayStatusByUserId(userId);
     }
-
 
 
     @Override
@@ -141,6 +143,50 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 修改支付单状态
         payOrder.setStatus(PayStatus.TRADE_CLOSED.getValue());
         updateById(payOrder);
+    }
+
+    @Override
+    public R<List<PayStatisticVO>> weekStatistic() {
+        // 获取当前时间和一周前的时间
+        LocalDateTime endOfDay = LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1).minusNanos(1);
+        LocalDateTime startOfWeek = endOfDay.minusDays(7);
+
+        // 创建一个列表来存储每一天的统计数据
+        List<PayStatisticVO> statistics = new ArrayList<>();
+
+        // 循环获取每一天的统计数据
+        for (LocalDateTime date = startOfWeek; !date.isAfter(endOfDay); date = date.plusDays(1)) {
+            PayStatisticVO dailyStatistic = dayStatistic(date);
+            statistics.add(dailyStatistic);
+        }
+
+        return R.ok(statistics);
+    }
+
+    /**
+     * 查询某天的支付统计
+     *
+     * @param time 时间
+     */
+    public PayStatisticVO dayStatistic(LocalDateTime time) {
+        // 获取当天的开始时间和结束时间
+        LocalDateTime startOfDay = time.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        // 查询当天的所有支付单
+        List<PayOrder> list = lambdaQuery().between(PayOrder::getPaySuccessTime, startOfDay, endOfDay).list();
+        Long totalFee = 0L;
+        Long totalOrder = (long) list.size();
+
+        // 计算总金额
+        for (PayOrder payOrder : list)
+            totalFee += payOrder.getAmount();
+
+        return PayStatisticVO.builder()
+                .totalFee(totalFee)
+                .totalOrder(totalOrder)
+                .time(time)
+                .build();
     }
 
     /**

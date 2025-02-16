@@ -16,7 +16,6 @@ import io.github.caolib.service.OAuthService;
 import io.github.caolib.utils.JwtTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -48,26 +47,6 @@ public class OAuthServiceImpl implements OAuthService {
     private final GithubProperties githubProperties;
 
     /**
-     * 获取请求体
-     *
-     * @param code 授权码
-     * @return 请求体
-     */
-    @NotNull
-    private HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/json");
-        // 设置请求体
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", githubProperties.getClientId());
-        body.add("client_secret", githubProperties.getClientSecret());
-        body.add("code", code);
-        body.add("redirect_uri", githubProperties.getCallBackUrl());
-
-        return new HttpEntity<>(body, headers);
-    }
-
-    /**
      * 获取访问令牌
      *
      * @param code 授权码
@@ -92,22 +71,18 @@ public class OAuthServiceImpl implements OAuthService {
             );
             // 返回访问令牌
             TokenResponse accessTokenResponse = responseEntity.getBody();
-            if (accessTokenResponse != null) {
-                return accessTokenResponse.getAccessToken();
-            } else {
-                throw new RuntimeException("获取访问令牌失败");
-            }
+            if (accessTokenResponse != null) return accessTokenResponse.getAccessToken();
+            else throw new RuntimeException("获取访问令牌失败");
         } catch (ResourceAccessException e) {
-            if (Objects.requireNonNull(e.getMessage()).contains("github.com/login/oauth/access_token")) {
+            if (Objects.requireNonNull(e.getMessage()).contains("github.com/login/oauth/access_token"))
                 throw new GitHubLoginException("连接超时,请检查网络！", 401);
-            } else {
-                throw new RuntimeException(e);
-            }
+            else throw new RuntimeException(e);
         }
     }
 
     /**
      * 第三方授权登录
+     *
      * @param code 授权码
      */
     @Override
@@ -163,6 +138,25 @@ public class OAuthServiceImpl implements OAuthService {
         // 返回用户信息
         UserLoginVO vo = jwtTool.setReturnUser(user, Auth.USER, avatarUrl);
         return R.ok(vo);
+    }
+
+    /**
+     * 获取请求体
+     *
+     * @param code 授权码
+     * @return 请求体
+     */
+    private HttpEntity<MultiValueMap<String, String>> getMultiValueMapHttpEntity(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+        // 设置请求体
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", githubProperties.getClientId());
+        body.add("client_secret", githubProperties.getClientSecret());
+        body.add("code", code);
+        body.add("redirect_uri", githubProperties.getCallBackUrl());
+
+        return new HttpEntity<>(body, headers);
     }
 
     /**

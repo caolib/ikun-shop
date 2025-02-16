@@ -36,6 +36,12 @@ public class UserController {
         return userService.login(loginFormDTO);
     }
 
+    @GetMapping("/logout")
+    public R<Void> logout(){
+        userService.logout();
+        return R.ok();
+    }
+
     /**
      * 扣减余额
      *
@@ -43,8 +49,8 @@ public class UserController {
      * @param amount 支付金额
      */
     @PutMapping("/money/deduct")
-    public R<String> deductMoney(@RequestParam("pw") String pw, @RequestParam("amount") Integer amount) {
-        return userService.deductBalance(pw, amount, UserContext.getUserId());
+    R<String> deductMoney(@RequestParam String pw, @RequestParam Integer amount, @RequestParam Long userId) {
+        return userService.deductBalance(pw, amount, userId);
     }
 
     // 用户注册

@@ -39,7 +39,7 @@ public class LoginFilter implements GlobalFilter, Ordered {
 
         UserInfo userInfo;
         try {
-            userInfo = jwtTool.parseToken(token); // 尝试解析token
+            userInfo = jwtTool.parseToken(token); // 解析token
         } catch (UnauthorizedException e) {
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.UNAUTHORIZED); // 设置状态码为401
