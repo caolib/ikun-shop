@@ -22,10 +22,10 @@ public class OrderQuery {
     private Integer status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime createTime;
+    private LocalDateTime createStartTime;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endTime;
+    private LocalDateTime createEndTime;
 
     public <T> Page<T> toPage() {
         return new Page<>(this.pageNo, this.pageSize);
