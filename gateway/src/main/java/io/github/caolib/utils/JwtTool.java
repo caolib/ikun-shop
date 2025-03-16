@@ -10,6 +10,8 @@ import io.github.caolib.enums.Auth;
 import io.github.caolib.enums.Code;
 import io.github.caolib.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -79,6 +81,9 @@ public class JwtTool {
             if (storeToken == null) throw new UnauthorizedException(Code.TOKEN_EXPIRED); // token已经过期
             // 返回用户信息
             return new UserInfo(userId, identity);
+        } catch (RedisConnectionFailureException | QueryTimeoutException e) {
+            logErr(e, "redis连接失败");
+            throw new UnauthorizedException("数据库服务繁忙，请稍后再试");
         } catch (UnauthorizedException e) {
             throw e;
         } catch (RuntimeException e) {

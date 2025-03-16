@@ -1,8 +1,6 @@
 spring:
   application:
     name: gateway
-  profiles:
-    active: dev
   cloud:
     nacos:
       server-addr: localhost:8848
@@ -18,3 +16,4 @@ spring:
           - data-id: status.yaml
             refresh: true
             group: DEV_GROUP
+

@@ -4,8 +4,3 @@ mysql:
   host: localhost
   username: root
   password: root
-
-
-spring:
-  redis:
-    database: 1

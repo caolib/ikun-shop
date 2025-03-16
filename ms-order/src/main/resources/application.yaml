@@ -5,3 +5,6 @@ spring:
     name: order
   main:
     banner-mode: off
+  output:
+    ansi:
+      enabled: always

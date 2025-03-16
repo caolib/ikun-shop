@@ -4,10 +4,11 @@ server:
 spring:
   profiles:
     active: dev
-  redis:
-    database: 2
   main:
     banner-mode: off
+  output:
+    ansi:
+      enabled: always
 shop:
   # jwt令牌校验
   jwt:
