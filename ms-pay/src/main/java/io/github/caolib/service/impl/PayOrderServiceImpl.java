@@ -35,14 +35,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     private final RabbitTemplate rabbitTemplate;
     private final PayOrderMapper payOrderMapper;
 
-    //@Override
-    //public String applyPayOrder(PayFormDTO applyDTO) {
-    //    // 幂等性校验
-    //    PayOrder payOrder = checkIdempotent(applyDTO);
-    //    // 返回支付单
-    //    return String.valueOf(payOrder.getId());
-    //}
-
     /**
      * 查询用户支付单
      */
@@ -99,7 +91,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             throw new BizIllegalException(errorMsg);
         }
         // RPC --> 扣减用户余额
-        R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount(),UserContext.getUserId());
+        R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount(), UserContext.getUserId());
         //log.debug("扣减用户余额结果：{}", res);
         if (res.getCode() != 200) {
             throw new BizIllegalException(res.getMsg(), res.getCode());// 扣减余额失败
@@ -146,16 +138,16 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
     @Override
-    public R<List<PayStatisticVO>> weekStatistic() {
-        // 获取当前时间和一周前的时间
+    public R<List<PayStatisticVO>> dayStatistic(int days) {
+        // 获取当前时间和指定天数前的时间
         LocalDateTime endOfDay = LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1).minusNanos(1);
-        LocalDateTime startOfWeek = endOfDay.minusDays(7);
+        LocalDateTime startOfPeriod = endOfDay.minusDays(days - 1);
 
         // 创建一个列表来存储每一天的统计数据
         List<PayStatisticVO> statistics = new ArrayList<>();
 
         // 循环获取每一天的统计数据
-        for (LocalDateTime date = startOfWeek; !date.isAfter(endOfDay); date = date.plusDays(1)) {
+        for (LocalDateTime date = startOfPeriod; !date.isAfter(endOfDay); date = date.plusDays(1)) {
             PayStatisticVO dailyStatistic = dayStatistic(date);
             statistics.add(dailyStatistic);
         }

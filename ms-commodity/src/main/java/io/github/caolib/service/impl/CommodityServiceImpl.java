@@ -96,7 +96,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
                 .le(maxPrice != null, Commodity::getPrice, maxPrice)
                 .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
         // 封装并返回
-        log.debug("分页查询结果: {}", PageDTO.of(result, CommodityDTO.class));
+        //log.debug("分页查询结果: {}", PageDTO.of(result, CommodityDTO.class));
         return PageDTO.of(result, CommodityDTO.class);
     }
 

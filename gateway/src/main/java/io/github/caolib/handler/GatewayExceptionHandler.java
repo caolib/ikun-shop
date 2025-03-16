@@ -20,4 +20,5 @@ public class GatewayExceptionHandler {
         logErr(e, msg);
         return R.error(msg);
     }
+
 }

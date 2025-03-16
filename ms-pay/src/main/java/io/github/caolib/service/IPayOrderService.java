@@ -27,7 +27,7 @@ public interface IPayOrderService extends IService<PayOrder> {
 
     void cancelPayOrder(Long payOrderId);
 
-    R<List<PayStatisticVO>> weekStatistic();
+    R<List<PayStatisticVO>> dayStatistic(int days);
 
     //Page<PayOrder> getPayOrderPage(PayOrderQuery query);
 }

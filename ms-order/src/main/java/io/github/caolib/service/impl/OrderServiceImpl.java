@@ -132,6 +132,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // RPC -> 取消支付单
         payClient.cancelPayOrder(payOrderId);
 
+
         // 查询订单详情
         List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();
         // 获取待恢复的商品列表
@@ -205,21 +206,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     public Page<Order> getOrderPage(OrderQuery query) {
+        log.debug("query:{}", query);
         Long id = query.getId();
-        LocalDateTime createTime = query.getCreateTime();
-        LocalDateTime endTime = query.getEndTime();
+        LocalDateTime createTime = query.getCreateStartTime();
+        LocalDateTime endTime = query.getCreateEndTime();
         Integer status = query.getStatus();
 
 
         return lambdaQuery().eq(id != null, Order::getId, id)
                 .eq(status != null, Order::getStatus, status)
                 .ge(createTime != null, Order::getCreateTime, createTime)
-                .le(endTime != null, Order::getEndTime, endTime)
+                .le(endTime != null, Order::getCreateTime, endTime)
                 .page(query.toPage());
     }
 
     /**
      * 删除订单
+     *
      * @param id 订单id
      */
     @Override

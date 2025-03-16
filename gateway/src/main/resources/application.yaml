@@ -17,4 +17,3 @@ shop:
       - /oauth/**
       - /**/health
       - /commodity/home
-

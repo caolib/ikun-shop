@@ -5,3 +5,6 @@ spring:
     name: commodity
   main:
     banner-mode: off
+  output:
+    ansi:
+      enabled: always

@@ -6,6 +6,7 @@ import io.github.caolib.service.IPayOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,8 +25,8 @@ public class PayManageController {
      * 近一个星期的支付统计
      */
     @GetMapping
-    public R<List<PayStatisticVO>> weekStatistic() {
-        return payOrderService.weekStatistic();
+    public R<List<PayStatisticVO>> weekStatistic(@RequestParam int days) {
+        return payOrderService.dayStatistic(days);
     }
 
 }
