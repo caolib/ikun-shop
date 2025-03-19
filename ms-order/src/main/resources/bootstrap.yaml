@@ -9,7 +9,7 @@ spring:
       config:
         # 共享配置
         shared-configs:
-          - data-id: mysql.yaml
+          - data-id: mysql-trade.yaml
             refresh: true
 
           - data-id: mybatis.yaml

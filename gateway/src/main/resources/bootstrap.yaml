@@ -10,6 +10,9 @@ spring:
             refresh: true
             group: GATEWAY_GROUP
 
+          - data-id: redis.yaml
+            refresh: true
+
           - data-id: logs.yaml
             refresh: true
 

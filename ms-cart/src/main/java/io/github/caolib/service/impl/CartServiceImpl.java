@@ -47,7 +47,6 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 判断购物车是否已经存在商品
         if (checkItemExists(cartFormDTO.getItemId(), userId)) {
             throw new BizIllegalException(Code.ITEM_ALREADY_EXIST);
-            //throw new AlreadyExistException("购物车中已存在该商品", 400);// 已存在存在
         }
         // 判断是否超过购物车数量
         checkCartsFull(userId);
@@ -92,8 +91,9 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         if (ids.isEmpty()) return;
         // 构建删除条件，userId和itemId
         QueryWrapper<Cart> queryWrapper = new QueryWrapper<>();
+        Long userId = UserContext.getUserId();
         queryWrapper.lambda()
-                .eq(Cart::getUserId, UserContext.getUserId())
+                .eq(userId != null, Cart::getUserId, userId)
                 .in(Cart::getItemId, ids);
         // 删除
         remove(queryWrapper);

@@ -1,9 +1,9 @@
 spring:
+  profiles:
+#    active: dev
+    active: prod
   application:
     name: user
-  profiles:
-    active: dev
-  #    active: prod
   cloud:
     nacos:
       server-addr: localhost:8848
@@ -20,7 +20,7 @@ spring:
             group: USER_GROUP
         # 共享配置
         shared-configs:
-          - data-id: mysql.yaml
+          - data-id: mysql-user.yaml
             refresh: true
 
           - data-id: mybatis.yaml

@@ -2,8 +2,6 @@ server:
   port: 9200
 
 spring:
-  profiles:
-    active: dev
   main:
     banner-mode: off
   output:
@@ -33,3 +31,4 @@ mysql:
   host: localhost
   username: root
   password: root
+

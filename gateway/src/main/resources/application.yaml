@@ -3,6 +3,9 @@ server:
 spring:
   main:
     banner-mode: off # 关闭启动时的logo
+  output:
+    ansi:
+      enabled: always
 shop:
   # 密钥校验信息
   jwt:

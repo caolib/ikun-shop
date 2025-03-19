@@ -14,7 +14,7 @@ spring:
             group: CART_GROUP
         # 共享配置
         shared-configs:
-          - data-id: mysql.yaml
+          - data-id: mysql-cart.yaml
             refresh: true
 
           - data-id: mybatis.yaml

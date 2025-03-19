@@ -8,7 +8,7 @@ spring:
       server-addr: localhost:8848
       config:
         shared-configs:
-          - data-id: mysql.yaml
+          - data-id: mysql-commodity.yaml
             refresh: true
 
           - data-id: mybatis.yaml
