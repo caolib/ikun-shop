@@ -1,6 +1,0 @@
-# mysql
-mysql:
-  name: commodity
-  host: localhost
-  username: root
-  password: root

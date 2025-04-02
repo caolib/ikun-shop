@@ -1,5 +1,6 @@
 server:
   port: 9100
+  address: "::"
 spring:
   application:
     name: cart

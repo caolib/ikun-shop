@@ -1,5 +1,6 @@
 server:
   port: 9400
+  address: "::"
 spring:
   application:
     name: pay

@@ -1,5 +1,6 @@
 server:
   port: 8080
+  address: "::"
 spring:
   main:
     banner-mode: off # 关闭启动时的logo
