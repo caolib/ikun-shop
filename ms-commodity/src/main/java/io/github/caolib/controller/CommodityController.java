@@ -74,17 +74,6 @@ public class CommodityController {
         return BeanUtils.copyBean(commodityService.getById(id), CommodityDTO.class);
     }
 
-    ///**
-    // * 新增商品
-    // *
-    // * @param item 商品信息
-    // */
-    //@PostMapping
-    //public void saveItem(@RequestBody CommodityDTO commodity) {
-    //    commodityService.save(BeanUtils.copyBean(commodity, Commodity.class));
-    //    //commodityService.addCommodity(commodity);
-    //}
-
     /**
      * 更新商品状态
      *
@@ -106,7 +95,7 @@ public class CommodityController {
      */
     @PutMapping
     public void updateItem(@RequestBody CommodityDTO item) {
-        // 不允许修改商品状态，所以强制设置为null，更新时，就会忽略该字段
+        // 不修改商品状态
         item.setStatus(null);
         // 更新
         commodityService.updateById(BeanUtils.copyBean(item, Commodity.class));

@@ -1,19 +1,16 @@
 server:
   port: 443
   address: "::"
+  # 证书配置
   ssl:
     key-store: classpath:keystore.p12
     key-store-password: ikun666
     key-store-type: PKCS12
     key-alias: ikun-shop
-spring:
-  main:
-    banner-mode: off # 关闭启动时的logo
-  output:
-    ansi:
-      enabled: always
+
+
+# 密钥校验配置
 shop:
-  # 密钥校验信息
   jwt:
     location: classpath:key.jks
     alias: ikun
@@ -26,3 +23,10 @@ shop:
       - /oauth/**
       - /**/health
       - /commodity/home
+
+spring:
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: always

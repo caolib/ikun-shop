@@ -9,30 +9,11 @@ spring:
       config:
         # 共享配置
         shared-configs:
-          - data-id: mysql-trade.yaml
+          - data-id: common.yaml
             refresh: true
 
-          - data-id: mybatis.yaml
-            refresh: true
-
-          - data-id: redis.yaml
-            refresh: true
-
-          - data-id: logs.yaml
-            refresh: true
-
-          - data-id: openfeign.yaml
-            refresh: true
-
-          - data-id: sentinel.yaml
-            refresh: true
-
-          - data-id: seata.yaml
+          - data-id: order.yaml
             refresh: true
 
           - data-id: rabbitmq.yaml
             refresh: true
-
-          - data-id: status.yaml
-            refresh: true
-            group: DEV_GROUP

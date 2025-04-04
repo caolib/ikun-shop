@@ -24,7 +24,7 @@ public class FeignConfig {
             if (userId != null)
                 requestTemplate.header(Auth.USER_ID, userId.toString());
             else
-                log.error("feign请求拦截器:用户ID为空");
+                log.warn("本次Feign请求未携带用户ID");
         };
     }
 }

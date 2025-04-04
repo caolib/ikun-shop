@@ -6,27 +6,8 @@ spring:
       server-addr: localhost:8848
       config:
         shared-configs:
-          - data-id: mysql-commodity.yaml
+          - data-id: common.yaml
             refresh: true
 
-          - data-id: mybatis.yaml
+          - data-id: commodity.yaml
             refresh: true
-
-          - data-id: redis.yaml
-            refresh: true
-
-          - data-id: logs.yaml
-            refresh: true
-
-          - data-id: openfeign.yaml
-            refresh: true
-
-          - data-id: sentinel.yaml
-            refresh: true
-
-          - data-id: seata.yaml
-            refresh: true
-
-          - data-id: status.yaml
-            refresh: true
-            group: DEV_GROUP

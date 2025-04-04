@@ -1,8 +1,0 @@
-# 数据源配置
-mysql:
-  name: cart
-  host: localhost
-  port: 3306
-  username: root
-  password: root
-
