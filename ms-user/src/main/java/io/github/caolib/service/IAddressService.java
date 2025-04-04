@@ -18,4 +18,6 @@ public interface IAddressService extends IService<Address> {
     void updateAddress(Long userId,AddressDTO addressDTO);
 
     void setDefaultAddress(Long userId,Long addressId);
+
+    R<Void> deleteAddress(Long userId, Long addressId);
 }

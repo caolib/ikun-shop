@@ -77,7 +77,8 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
 
     /**
      * 更新地址
-     * @param userId 用户id
+     *
+     * @param userId     用户id
      * @param addressDTO 地址信息
      */
     @Override
@@ -92,18 +93,18 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
 
     /**
      * 设置默认地址
-     * @param userId 用户id
+     *
+     * @param userId    用户id
      * @param addressId 地址id
      */
     @Override
     @Transactional
     @CacheEvict(value = Cache.ADDRESS, key = "#userId")
-    public void setDefaultAddress(Long userId,Long addressId) {
+    public void setDefaultAddress(Long userId, Long addressId) {
         // 查询地址
         Address address = getById(addressId);
         // 判断是否是当前用户的地址
-        if (!address.getUserId().equals(userId))
-            throw new BadRequestException(Code.ADDR_NOT_BELONG_USER);
+        if (!address.getUserId().equals(userId)) throw new BadRequestException(Code.ADDR_NOT_BELONG_USER);
 
         // 查询用户的所有地址
         List<Address> list = list(new LambdaQueryWrapper<Address>().eq(Address::getUserId, userId));
@@ -111,5 +112,12 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         list.forEach(a -> a.setIsDefault(a.getId().equals(addressId) ? 1 : 0));
         // 更新
         updateBatchById(list);
+    }
+
+    @Override
+    @CacheEvict(value = Cache.ADDRESS, key = "#userId")
+    public R<Void> deleteAddress(Long userId, Long addressId) {
+        removeById(addressId);
+        return R.ok();
     }
 }

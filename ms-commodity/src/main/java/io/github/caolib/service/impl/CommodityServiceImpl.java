@@ -47,7 +47,6 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         // 分页查询
         Page<Commodity> result = lambdaQuery()
                 .eq(isUser, Commodity::getStatus, 1)
-                .last("ORDER BY RAND()") // 随机排序
                 .page(q.toMpPage(q.getSortBy(), q.getIsAsc()));
 
         return PageDTO.of(result, CommodityDTO.class);
