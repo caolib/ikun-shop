@@ -4,6 +4,7 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.OrderFormDTO;
 import io.github.caolib.domain.vo.OrderVO;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.domain.vo.PayDetailVO;
 import io.github.caolib.service.IOrderService;
 import io.github.caolib.utils.BeanUtils;
 import io.github.caolib.utils.CollUtils;
@@ -78,5 +79,20 @@ public class OrderController {
         return orderService.deleteOrders(ids);
     }
 
+    /**
+     * 批量查询订单详情
+     */
+    @PostMapping("/getDetails")
+    List<PayDetailVO> getPayDetail(@RequestBody List<Long> orderIds){
+        return orderService.getPayDetails(orderIds);
+    }
+
+    /**
+     * 健康状态
+     */
+    @GetMapping("/health")
+    public R<String> health() {
+        return R.ok("ok");
+    }
 
 }

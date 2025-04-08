@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public R<Void> logout(){
+    public R<Void> logout() {
         userService.logout();
         return R.ok();
     }
@@ -99,4 +99,11 @@ public class UserController {
         return userService.cancelAccount(UserContext.getUserId());
     }
 
+    /**
+     * 健康状态
+     */
+    @GetMapping("/health")
+    public R<String> health() {
+        return R.ok("ok");
+    }
 }

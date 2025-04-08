@@ -1,38 +1,22 @@
 spring:
   application:
     name: order
-  profiles:
-    active: dev
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: always
   cloud:
     nacos:
       server-addr: localhost:8848
       config:
         # 共享配置
         shared-configs:
-          - data-id: mysql.yaml
+          - data-id: common.yaml
             refresh: true
 
-          - data-id: mybatis.yaml
-            refresh: true
-
-          - data-id: redis.yaml
-            refresh: true
-
-          - data-id: logs.yaml
-            refresh: true
-
-          - data-id: openfeign.yaml
-            refresh: true
-
-          - data-id: sentinel.yaml
-            refresh: true
-
-          - data-id: seata.yaml
+          - data-id: order.yaml
             refresh: true
 
           - data-id: rabbitmq.yaml
             refresh: true
-
-          - data-id: status.yaml
-            refresh: true
-            group: DEV_GROUP

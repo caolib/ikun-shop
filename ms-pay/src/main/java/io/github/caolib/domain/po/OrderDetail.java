@@ -11,41 +11,58 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-
+/**
+ * 订单详情
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("`order`")
-public class Order implements Serializable {
+@TableName("order_detail")
+public class OrderDetail implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 订单id
+     * 订单详情id 
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 总金额，单位为分
+     * 订单id
      */
-    private Integer totalFee;
+    private Long orderId;
 
     /**
-     * 支付类型，1、支付宝，2、微信，3、扣减余额
+     * sku商品id
      */
-    private Integer paymentType;
+    private Long itemId;
 
     /**
-     * 用户id
+     * 购买数量
      */
-    private Long userId;
+    private Integer num;
 
     /**
-     * 订单的状态，1、未付款 2、已付款,未发货 3、已发货,未确认 4、确认收货，交易成功 5、交易取消，订单关闭
+     * 商品标题
      */
-    private Integer status;
+    private String name;
+
+    /**
+     * 商品规格 键值对
+     */
+    private String spec;
+
+    /**
+     * 价格,单位：分
+     */
+    private Integer price;
+
+    /**
+     * 商品图片
+     */
+    private String image;
 
     /**
      * 创建时间
@@ -53,22 +70,9 @@ public class Order implements Serializable {
     private LocalDateTime createTime;
 
     /**
-     * 支付时间
-     */
-    private LocalDateTime payTime;
-
-    /**
-     * 交易完成时间
-     */
-    private LocalDateTime endTime;
-
-    /**
-     * 交易关闭时间
-     */
-    private LocalDateTime closeTime;
-
-    /**
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+
 }

@@ -166,6 +166,7 @@ public class OAuthServiceImpl implements OAuthService {
      * @return GitHub 用户信息
      */
     public GitHubUser getGitHubUser(String accessToken) {
+        if (accessToken == null) throw new GitHubLoginException("获取 GitHub 用户信息失败", 401);
         log.debug("开始获取 GitHub 用户信息...");
         RestTemplate restTemplate = new RestTemplate();
         // 设置请求头，携带 access_token

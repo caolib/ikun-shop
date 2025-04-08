@@ -1,6 +1,8 @@
 package io.github.caolib.controller.admin;
 
+import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
+import io.github.caolib.domain.po.Commodity;
 import io.github.caolib.service.ICommodityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,5 +44,13 @@ public class CommodityManageController {
         commodityService.addCommodity(commodity);
     }
 
+    /**
+     * 查询商品信息
+     */
+    @GetMapping
+    public R<Commodity> getCommodity(@RequestParam Long id) {
+        log.debug("查询商品信息 {}", id);
+        return R.ok(commodityService.getCommodity(id));
+    }
 
 }

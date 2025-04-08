@@ -43,7 +43,7 @@ public class Order implements Serializable {
     private Long userId;
 
     /**
-     * 订单的状态，1、未付款 2、已付款,未发货 3、已发货,未确认 4、确认收货，交易成功 5、交易取消，订单关闭 6、交易结束，已评价
+     * 订单的状态，1、未付款 2、已付款,未发货 3、已发货,未确认 4、确认收货，交易成功 5、交易取消，订单关闭
      */
     private Integer status;
 
@@ -71,11 +71,6 @@ public class Order implements Serializable {
      * 交易关闭时间
      */
     private LocalDateTime closeTime;
-
-    /**
-     * 评价时间
-     */
-    private LocalDateTime commentTime;
 
     /**
      * 更新时间

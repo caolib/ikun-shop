@@ -4,8 +4,10 @@ import feign.Logger;
 import feign.RequestInterceptor;
 import io.github.caolib.enums.Auth;
 import io.github.caolib.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 
+@Slf4j
 public class FeignConfig {
     @Bean
     public Logger.Level feignLoggerLevel() {
@@ -21,6 +23,8 @@ public class FeignConfig {
             Long userId = UserContext.getUserId();
             if (userId != null)
                 requestTemplate.header(Auth.USER_ID, userId.toString());
+            else
+                log.warn("本次Feign请求未携带用户ID");
         };
     }
 }

@@ -1,6 +1,0 @@
-mysql:
-  name: pay
-  host: localhost
-  username: root
-  password: root
-

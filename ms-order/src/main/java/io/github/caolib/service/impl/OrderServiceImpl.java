@@ -16,6 +16,7 @@ import io.github.caolib.domain.po.OrderDetail;
 import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.domain.vo.PayDetailVO;
 import io.github.caolib.enums.E;
 import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
@@ -51,6 +52,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final RabbitTemplate rabbitTemplate;
     private final OrderMapper orderMapper;
     private final UserClient userClient;
+
 
     @Override
     @GlobalTransactional
@@ -147,7 +149,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         commodityClient.releaseStock(dtos);
     }
 
-
     /**
      * 获取用户所有订单
      */
@@ -157,10 +158,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Long userId = UserContext.getUserId();
 
         // 获取用户所有订单
-        List<Order> orders = lambdaQuery()
-                .eq(Order::getUserId, userId)
-                .orderByDesc(Order::getCreateTime)
-                .list();
+        List<Order> orders = lambdaQuery().eq(Order::getUserId, userId).orderByDesc(Order::getCreateTime).list();
 
         // 判断订单是否为空
         if (orders.isEmpty()) return R.ok(List.of());
@@ -192,9 +190,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Long userId = UserContext.getUserId();
 
         // 删除订单
-        lambdaUpdate().eq(Order::getUserId, userId)
-                .in(Order::getId, orderIds)
-                .remove();
+        lambdaUpdate().eq(Order::getUserId, userId).in(Order::getId, orderIds).remove();
 
         return R.ok();
     }
@@ -213,11 +209,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Integer status = query.getStatus();
 
 
-        return lambdaQuery().eq(id != null, Order::getId, id)
-                .eq(status != null, Order::getStatus, status)
-                .ge(createTime != null, Order::getCreateTime, createTime)
-                .le(endTime != null, Order::getCreateTime, endTime)
-                .page(query.toPage());
+        return lambdaQuery().eq(id != null, Order::getId, id).eq(status != null, Order::getStatus, status).ge(createTime != null, Order::getCreateTime, createTime).le(endTime != null, Order::getCreateTime, endTime).page(query.toPage());
     }
 
     /**
@@ -227,8 +219,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     public void deleteOrder(Long id) {
-        if (!removeById(id))
-            throw new BadRequestException(E.ORDER_NOT_EXIST);
+        if (!removeById(id)) throw new BadRequestException(E.ORDER_NOT_EXIST);
     }
 
     @Override
@@ -246,6 +237,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detailVO.setOrderDetails(details);
 
         return detailVO;
+    }
+
+    @Override
+    public List<PayDetailVO> getPayDetails(List<Long> orderIds) {
+        if (orderIds.isEmpty()) return List.of();
+        // 查询订单详情信息
+        List<OrderDetail> orders = detailService.lambdaQuery().in(OrderDetail::getOrderId, orderIds).list();
+
+        // 使用 Map 合并相同 itemId 的商品，并累加数量
+        Map<Long, PayDetailVO> detailMap = orders.stream().collect(Collectors.toMap(OrderDetail::getItemId,
+                detail -> PayDetailVO.builder().itemId(detail.getItemId()).name(detail.getName()).num(detail.getNum()).build(),
+                (existing, replacement) -> {
+                    existing.setNum(existing.getNum() + replacement.getNum());
+                    return existing;
+                }
+        ));
+
+        // 将 Map 转换为 List 并返回
+        return new ArrayList<>(detailMap.values());
     }
 
 
