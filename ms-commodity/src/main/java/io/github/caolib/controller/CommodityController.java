@@ -130,4 +130,12 @@ public class CommodityController {
     public void releaseStock(@RequestBody List<OrderDetailDTO> dtos) {
         commodityService.releaseStock(dtos);
     }
+
+    /**
+     * 健康状态
+     */
+    @GetMapping("/health")
+    public R<String> health() {
+        return R.ok("ok");
+    }
 }

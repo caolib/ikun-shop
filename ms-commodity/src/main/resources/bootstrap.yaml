@@ -1,6 +1,11 @@
 spring:
   application:
     name: commodity
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: always
   cloud:
     nacos:
       server-addr: localhost:8848
@@ -8,6 +13,5 @@ spring:
         shared-configs:
           - data-id: common.yaml
             refresh: true
-
           - data-id: commodity.yaml
             refresh: true

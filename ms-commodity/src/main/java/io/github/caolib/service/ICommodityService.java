@@ -27,6 +27,5 @@ public interface ICommodityService extends IService<Commodity> {
 
     void addCommodity(CommodityDTO commodity);
 
-
-    //PageDTO<CommodityDTO> queryItemByPage(PageQuery query);
+    Commodity getCommodity(Long id);
 }

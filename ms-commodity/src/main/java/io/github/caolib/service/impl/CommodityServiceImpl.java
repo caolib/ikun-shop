@@ -72,6 +72,11 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     }
 
     @Override
+    public Commodity getCommodity(Long id) {
+        return getById(id);
+    }
+
+    @Override
     @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
     public PageDTO<CommodityDTO> pageQuery(SearchQuery q) {
         // 判断用户身份

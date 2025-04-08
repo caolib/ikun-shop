@@ -9,6 +9,7 @@ import io.github.caolib.domain.po.Order;
 import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
+import io.github.caolib.domain.vo.PayDetailVO;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface IOrderService extends IService<Order> {
     void deleteOrder(Long id);
 
     OrderDetailVO getOrderDetail(Long id);
+
+    List<PayDetailVO> getPayDetails(List<Long> orderIds);
 }

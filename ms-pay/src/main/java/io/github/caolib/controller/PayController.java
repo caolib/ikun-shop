@@ -79,5 +79,12 @@ public class PayController {
     }
 
 
+    /**
+     * 健康状态
+     */
+    @GetMapping("/health")
+    public R<String> health() {
+        return R.ok("ok");
+    }
 
 }

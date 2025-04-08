@@ -4,11 +4,14 @@ package io.github.caolib.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.caolib.client.OrderClient;
 import io.github.caolib.client.UserClient;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
+import io.github.caolib.domain.vo.PayDetailResVO;
+import io.github.caolib.domain.vo.PayDetailVO;
 import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.domain.vo.PayStatisticVO;
 import io.github.caolib.enums.*;
@@ -23,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
     private final UserClient userClient;
+    private final OrderClient orderClient;
     private final RabbitTemplate rabbitTemplate;
     private final PayOrderMapper payOrderMapper;
 
@@ -153,6 +158,43 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
 
         return R.ok(statistics);
+    }
+
+    /**
+     * 查询一段时间内商品销售详情
+     *
+     * @param durationStart 开始日期
+     * @param durationEnd   结束日期
+     */
+    @Override
+    public R<List<PayDetailResVO>> payDetail(LocalDate durationStart, LocalDate durationEnd) {
+        List<PayDetailResVO> result = new ArrayList<>();
+
+        // 遍历每一天的日期
+        for (LocalDate date = durationStart; !date.isAfter(durationEnd); date = date.plusDays(1)) {
+            // 查询当天的支付单号
+            List<Long> payOrderIds = lambdaQuery()
+                    .between(PayOrder::getPaySuccessTime, date.atStartOfDay(), date.plusDays(1).atStartOfDay().minusNanos(1))
+                    .list()
+                    .stream()
+                    .map(PayOrder::getBizOrderNo)
+                    .toList();
+
+            if (payOrderIds.isEmpty()) {
+                result.add(new PayDetailResVO().setDate(date).setPayDetailList(new ArrayList<>()));
+            }
+
+            // 使用 orderClient 获取订单详情
+            List<PayDetailVO> payDetail = orderClient.getPayDetail(payOrderIds);
+
+            // 封装结果
+            PayDetailResVO payDetailResVO = new PayDetailResVO()
+                    .setDate(date)
+                    .setPayDetailList(payDetail);
+            result.add(payDetailResVO);
+        }
+
+        return R.ok(result);
     }
 
     /**

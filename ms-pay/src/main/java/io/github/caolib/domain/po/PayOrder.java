@@ -21,10 +21,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("pay_order")
 public class PayOrder implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     /**
      * id
      */

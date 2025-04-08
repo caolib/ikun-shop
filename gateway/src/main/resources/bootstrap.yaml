@@ -8,3 +8,8 @@ spring:
         shared-configs:
           - data-id: gateway.yaml
             refresh: true
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: always

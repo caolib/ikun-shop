@@ -6,15 +6,14 @@ import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
 import io.github.caolib.domain.po.PayOrder;
+import io.github.caolib.domain.vo.PayDetailResVO;
 import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.domain.vo.PayStatisticVO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IPayOrderService extends IService<PayOrder> {
-
-    //String applyPayOrder(PayFormDTO applyDTO);
-
     R<PayOrder> createPayOrder(PayFormDTO applyDTO);
 
     void payOrderByBalance(PayOrderFormDTO payOrderFormDTO);
@@ -29,5 +28,5 @@ public interface IPayOrderService extends IService<PayOrder> {
 
     R<List<PayStatisticVO>> dayStatistic(int days);
 
-    //Page<PayOrder> getPayOrderPage(PayOrderQuery query);
+    R<List<PayDetailResVO>> payDetail(LocalDate durationStart, LocalDate durationEnd);
 }
