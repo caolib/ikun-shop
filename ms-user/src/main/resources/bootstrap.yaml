@@ -3,11 +3,6 @@ spring:
     active: prod
   application:
     name: user
-  main:
-    banner-mode: off
-  output:
-    ansi:
-      enabled: always
   cloud:
     nacos:
       server-addr: localhost:8848
