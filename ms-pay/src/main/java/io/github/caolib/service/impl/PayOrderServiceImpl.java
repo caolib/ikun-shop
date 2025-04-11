@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.caolib.client.OrderClient;
 import io.github.caolib.client.UserClient;
+import io.github.caolib.config.TimeProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.PayFormDTO;
 import io.github.caolib.domain.dto.PayOrderFormDTO;
@@ -14,7 +15,10 @@ import io.github.caolib.domain.vo.PayDetailResVO;
 import io.github.caolib.domain.vo.PayDetailVO;
 import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.domain.vo.PayStatisticVO;
-import io.github.caolib.enums.*;
+import io.github.caolib.enums.Code;
+import io.github.caolib.enums.E;
+import io.github.caolib.enums.PayStatus;
+import io.github.caolib.enums.Q;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.PayOrderMapper;
 import io.github.caolib.service.IPayOrderService;
@@ -39,6 +43,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     private final OrderClient orderClient;
     private final RabbitTemplate rabbitTemplate;
     private final PayOrderMapper payOrderMapper;
+    private final TimeProperties timeProperties;
 
     /**
      * 查询用户支付单
@@ -131,9 +136,10 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
 
     @Override
-    public void cancelPayOrder(Long payOrderId) {
+    public void cancelPayOrder(Long orderId) {
         // 查询支付单
-        PayOrder payOrder = getById(payOrderId);
+        PayOrder payOrder = lambdaQuery().eq(PayOrder::getBizOrderNo, orderId).one();
+
         if (payOrder == null) {
             throw new BizIllegalException(Code.PAY_ORDER_NOT_FOUND);
         }
@@ -284,7 +290,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 转换为PO
         PayOrder payOrder = BeanUtils.toBean(payApplyDTO, PayOrder.class);
         // 初始化数据
-        payOrder.setPayOverTime(LocalDateTime.now().plusSeconds(Time.TIMEOUT / 1000)); // 设置超时时间
+        payOrder.setPayOverTime(LocalDateTime.now().plusSeconds(timeProperties.getPayTimeout() / 1000)); // 设置支付单超时时间
         payOrder.setStatus(PayStatus.WAIT_BUYER_PAY.getValue()); // 设置为等待支付状态
         payOrder.setBizUserId(UserContext.getUserId());
         return payOrder;

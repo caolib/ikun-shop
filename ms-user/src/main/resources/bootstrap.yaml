@@ -1,13 +1,6 @@
 spring:
-  profiles:
-    active: prod
   application:
     name: user
-  main:
-    banner-mode: off
-  output:
-    ansi:
-      enabled: always
   cloud:
     nacos:
       server-addr: localhost:8848
@@ -15,7 +8,7 @@ spring:
         # 拓展配置
         extension-configs:
           # github授权登录配置
-          - data-id: github-${spring.profiles.active}.yaml
+          - data-id: github.yaml
             refresh: true
             group: USER_GROUP
         # 共享配置

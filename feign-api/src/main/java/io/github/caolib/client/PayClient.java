@@ -20,8 +20,8 @@ public interface PayClient {
     /**
      * 取消支付单
      *
-     * @param payOrderId 支付单id
+     * @param orderId 订单id
      */
-    @PutMapping("/{payOrderId}")
-    void cancelPayOrder(@PathVariable Long payOrderId);
+    @PutMapping("/{orderId}")
+    void cancelPayOrder(@PathVariable Long orderId);
 }
