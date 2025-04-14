@@ -5,6 +5,8 @@ public class Cache {
     public static final String COMMODITY_PAGE = "commodity:page"; // 商品分页查询缓存
     public static final String COMMODITY_IDS = "commodity:ids"; // 商品id查询缓存
     public static final String COMMODITY_LIST = "commodity:list"; // 商品id查询缓存
+    public static final String COMMODITY_HOME = "commodity:home"; // 商品主页缓存
+    public static final String COMMODITY_ALL = "commodity:*"; // 所有商品
 
     // 用户
     public static final String USER_INFO = "user:info"; // 用户信息缓存

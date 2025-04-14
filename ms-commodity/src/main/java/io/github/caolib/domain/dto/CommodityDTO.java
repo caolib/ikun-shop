@@ -3,6 +3,7 @@ package io.github.caolib.domain.dto;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -10,6 +11,8 @@ import java.io.Serializable;
  */
 @Data
 public class CommodityDTO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     /**
      * 商品id
      */
@@ -54,10 +57,6 @@ public class CommodityDTO implements Serializable {
      */
     @Min(0)
     private Integer commentCount;
-    /**
-     * 是否是推广广告，true/false
-     */
-    private Boolean isAD;
     /**
      * 商品状态 1-正常，2-下架，3-删除
      */
