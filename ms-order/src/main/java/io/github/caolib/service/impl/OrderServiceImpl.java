@@ -80,7 +80,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setTotalFee(total);
         order.setPaymentType(orderFormDTO.getPaymentType());
         order.setUserId(UserContext.getUserId());
-        order.setStatus(1);
+        order.setStatus(OrderStatus.NON_PAYMENT.getCode());
         // 将订单写入order表中
         save(order);
 
