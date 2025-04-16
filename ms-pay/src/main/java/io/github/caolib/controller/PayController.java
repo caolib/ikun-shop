@@ -48,7 +48,6 @@ public class PayController {
 
     /**
      * 使用用户余额支付
-     * FIXME
      * @param id  支付单记录id
      * @param dto 支付订单表单数据传输对象
      */

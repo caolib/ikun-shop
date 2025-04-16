@@ -50,7 +50,7 @@ public class CommodityManageController {
     @GetMapping
     public R<Commodity> getCommodity(@RequestParam Long id) {
         log.debug("查询商品信息 {}", id);
-        return R.ok(commodityService.getCommodity(id));
+        return R.ok(commodityService.getCommodityById(id));
     }
 
 }

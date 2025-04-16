@@ -72,10 +72,18 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         save(c);
     }
 
+    /**
+     * 根据id查询商品
+     *
+     * @param id 商品id
+     * @return 商品信息
+     */
     @Override
-    public Commodity getCommodity(Long id) {
+    @Cacheable(value = Cache.COMMODITY_ID, key = "#id")
+    public Commodity getCommodityById(Long id) {
         return getById(id);
     }
+
 
     @Override
     @Cacheable(value = Cache.COMMODITY_PAGE, key = "#q")
