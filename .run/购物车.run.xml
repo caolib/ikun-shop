@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="购物车" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" activateToolWindowBeforeRun="false">
+    <option name="HIDE_BANNER" value="true" />
     <module name="ms-cart" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.caolib.CartApp" />
-    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />
+    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED -Dspring.output.ansi.enabled=always -Dspring.main.banner-mode=off" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.caolib.*" />

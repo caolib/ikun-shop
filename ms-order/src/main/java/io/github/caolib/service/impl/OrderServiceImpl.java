@@ -7,6 +7,7 @@ import io.github.caolib.client.CartClient;
 import io.github.caolib.client.CommodityClient;
 import io.github.caolib.client.PayClient;
 import io.github.caolib.client.UserClient;
+import io.github.caolib.config.TimeProperties;
 import io.github.caolib.domain.R;
 import io.github.caolib.domain.dto.CommodityDTO;
 import io.github.caolib.domain.dto.OrderDetailDTO;
@@ -17,10 +18,10 @@ import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
 import io.github.caolib.domain.vo.PayDetailVO;
+import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.enums.E;
 import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
-import io.github.caolib.enums.Time;
 import io.github.caolib.exception.BadRequestException;
 import io.github.caolib.mapper.OrderMapper;
 import io.github.caolib.service.IOrderDetailService;
@@ -52,6 +53,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final RabbitTemplate rabbitTemplate;
     private final OrderMapper orderMapper;
     private final UserClient userClient;
+    private final TimeProperties timeProperties;
 
 
     @Override
@@ -78,7 +80,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setTotalFee(total);
         order.setPaymentType(orderFormDTO.getPaymentType());
         order.setUserId(UserContext.getUserId());
-        order.setStatus(1);
+        order.setStatus(OrderStatus.NON_PAYMENT.getCode());
         // 将订单写入order表中
         save(order);
 
@@ -96,8 +98,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         cartClient.deleteCartItemByIds(itemIds);
 
         // MQ -> 发送延迟消息，标记订单状态 [超时/已支付]
-        rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(Time.TIMEOUT.intValue()));
-        //rabbitTemplate.convertAndSend(Q.PAY_DELAY_EXCHANGE, Q.PAY_DELAY_KEY, order.getId(), MessageConfig.getMessagePostProcessor(20000));
+        rabbitTemplate.convertAndSend(
+                Q.PAY_DELAY_EXCHANGE,
+                Q.PAY_DELAY_KEY,
+                order.getId(),
+                MessageConfig.getMessagePostProcessor(timeProperties.getPayTimeout().intValue()));
         log.debug("<发送延迟消息，标记订单状态 [超时/已支付] --> MQ orderId:{}>", order.getId());
 
         return order.getId();
@@ -109,13 +114,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @param orderId 订单id
      */
     @Override
-    public void markOrderPaySuccess(Long orderId) {
-        Order order = new Order();
+    public R<String> markOrderPaySuccess(Long orderId) {
+        // 查询订单
+        Order order = getById(orderId);
+        if (order == null) throw new BadRequestException(E.ORDER_NOT_EXIST);
+        // 查询支付单
+        PayOrderVO payOrderVO = payClient.getPayOrderByOrderId(orderId);
+        // 查询支付单状态
+        switch (payOrderVO.getStatus()) {
+            case 0:
+                return R.error("支付单未提交");
+            case 2:
+                return R.error("支付单已超时或取消");
+            case 3:
+                return R.error("支付单已支付");
+            default:
+                break;
+        }
+
         order.setId(orderId);
         order.setStatus(OrderStatus.SUCCESS.getCode());
         order.setPayTime(LocalDateTime.now());
-        // TODO 发送延迟消息模拟发货收货等，更新订单时间
         updateById(order);
+
+        return R.ok("支付成功");
     }
 
     /**
@@ -129,10 +151,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 取消订单
         orderMapper.markOrderTimeout(orderId, OrderStatus.CLOSED.getCode());
 
-        // RPC -> 查询支付单
-        Long payOrderId = payClient.getPayOrderByOrderId(orderId).getId();
         // RPC -> 取消支付单
-        payClient.cancelPayOrder(payOrderId);
+        payClient.cancelPayOrder(orderId);
+
+        //// RPC -> 查询支付单
+        //Long payOrderId = payClient.getPayOrderByOrderId(orderId).getId();
+        //// RPC -> 取消支付单
+        //payClient.cancelPayOrder(payOrderId);
 
 
         // 查询订单详情

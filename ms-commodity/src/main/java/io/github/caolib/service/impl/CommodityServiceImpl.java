@@ -39,6 +39,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     private final CommodityMapper commodityMapper;
 
     @Override
+    @Cacheable(value = Cache.COMMODITY_HOME, key = "#q")
     public PageDTO<CommodityDTO> homePage(SearchQuery q) {
         // 判断用户身份
         String identity = UserContext.getIdentity();
@@ -71,13 +72,21 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         save(c);
     }
 
+    /**
+     * 根据id查询商品
+     *
+     * @param id 商品id
+     * @return 商品信息
+     */
     @Override
-    public Commodity getCommodity(Long id) {
+    @Cacheable(value = Cache.COMMODITY_ID, key = "#id")
+    public Commodity getCommodityById(Long id) {
         return getById(id);
     }
 
+
     @Override
-    @Cacheable(value = Cache.COMMODITY_LIST, key = "#q")
+    @Cacheable(value = Cache.COMMODITY_PAGE, key = "#q")
     public PageDTO<CommodityDTO> pageQuery(SearchQuery q) {
         // 判断用户身份
         String identity = UserContext.getIdentity();
@@ -112,7 +121,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
      */
     @Override
     @Transactional
-    @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
+    @CacheEvict(value = Cache.COMMODITY_ALL, allEntries = true)
     public R<Void> deductStock(List<OrderDetailDTO> items) {
         items.forEach(item -> {
             Commodity commodity = getById(item.getItemId()); // 查询商品
@@ -144,7 +153,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
      * @param dtos 商品列表
      */
     @Override
-    @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
+    @CacheEvict(value = Cache.COMMODITY_ALL, allEntries = true)
     public void releaseStock(List<OrderDetailDTO> dtos) {
         dtos.forEach(dto -> commodityMapper.recover(dto.getItemId(), dto.getNum()));
     }
@@ -156,7 +165,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
      * @param commodityDTO 商品信息
      */
     @Override
-    @CacheEvict(value = {Cache.COMMODITY_LIST, Cache.COMMODITY_IDS}, allEntries = true)
+    @CacheEvict(value = Cache.COMMODITY_ALL, allEntries = true)
     public void updateCommodity(CommodityDTO commodityDTO) {
         // 查询商品是否存在
         Commodity c = getById(commodityDTO.getId());

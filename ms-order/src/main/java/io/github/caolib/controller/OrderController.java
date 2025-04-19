@@ -61,8 +61,8 @@ public class OrderController {
      * @param orderId 订单id
      */
     @PutMapping("/{orderId}")
-    public void markOrderPaySuccess(@PathVariable("orderId") Long orderId) {
-        orderService.markOrderPaySuccess(orderId);
+    public R<String> markOrderPaySuccess(@PathVariable("orderId") Long orderId) {
+       return orderService.markOrderPaySuccess(orderId);
     }
 
 

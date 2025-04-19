@@ -1,0 +1,286 @@
+{
+  "code": 200,
+  "msg": "成功",
+  "data": [
+    {
+      "date": "2025-02-03",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1026
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 395
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 233
+        }
+      ]
+    },
+    {
+      "date": "2025-02-04",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 972
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 360
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 189
+        }
+      ]
+    },
+    {
+      "date": "2025-02-05",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1080
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 285
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 175
+        }
+      ]
+    },
+    {
+      "date": "2025-02-06",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1097
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 252
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 199
+        }
+      ]
+    },
+    {
+      "date": "2025-02-07",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1092
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 198
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 218
+        }
+      ]
+    },
+    {
+      "date": "2025-02-08",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 2074
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 344
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 220
+        }
+      ]
+    },
+    {
+      "date": "2025-02-09",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 2014
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 469
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 229
+        }
+      ]
+    },
+    {
+      "date": "2025-02-10",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 996
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 435
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 207
+        }
+      ]
+    },
+    {
+      "date": "2025-02-11",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 900
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 343
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 191
+        }
+      ]
+    },
+    {
+      "date": "2025-02-12",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 915
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 297
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 168
+        }
+      ]
+    },
+    {
+      "date": "2025-02-13",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1088
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 229
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 171
+        }
+      ]
+    },
+    {
+      "date": "2025-02-14",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 1053
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 198
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 232
+        }
+      ]
+    },
+    {
+      "date": "2025-02-15",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 2055
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 350
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 230
+        }
+      ]
+    },
+    {
+      "date": "2025-02-16",
+      "payDetailList": [
+        {
+          "itemId": "1861100",
+          "name": "Apple iPhone 6s Plus (A1699) 128G 玫瑰金色 移动联通电信4G手机",
+          "num": 2087
+        },
+        {
+          "itemId": "317580",
+          "name": "RIMOWA 26寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 479
+        },
+        {
+          "itemId": "317578",
+          "name": "RIMOWA 21寸托运箱拉杆箱 SALSA AIR系列果绿色 820.70.36.4",
+          "num": 196
+        }
+      ]
+    }
+  ]
+}

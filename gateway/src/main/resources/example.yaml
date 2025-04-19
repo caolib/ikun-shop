@@ -1,0 +1,96 @@
+server:
+  port: 80
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: cart
+          uri: lb://cart
+          predicates:
+            - Path=/carts/**,/cart/**
+
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/orders/**,/order/**
+
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/users/**,/addresses/**,/oauth/**,/user/**
+
+        - id: commodity
+          uri: lb://commodity
+          predicates:
+            - Path=/commodity/**,/search/**
+
+        - id: pay
+          uri: lb://pay
+          predicates:
+            - Path=/pays/**,/pay/**
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - https://ikunshop.pages.dev
+              - https://dev.ikunshop.pages.dev
+              - http://localhost:5173
+              - http://localhost:1420
+              - http://localhost:14200
+              - http://tauri.localhost
+              - https://clb.surge.sh
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+    # 允许nacos负载均衡
+    loadbalancer:
+      nacos:
+        enabled: true
+
+  # redis配置
+  redis:
+    host: centos
+    # host: 52.184.71.33      # Redis服务器IP
+    port: 6379
+    password: Ccjaisdjiajsdnsidonvoisdn # 密码
+    timeout: 5000ms # 连接/命令超时时间（更合理的阈值）
+    lettuce:
+      # --- Lettuce 连接池配置 (主要影响同步/阻塞命令的执行) ---
+      pool:
+        # 最小空闲连接数
+        min-idle: 2
+        # -- 获取连接等待时间 --
+        max-wait: 3000ms
+      # Netty 和 Lettuce 资源的关闭超时时间。
+      shutdown-timeout: 500ms
+
+# 日志配置
+logging:
+  level:
+    io.github.caolib: debug
+  pattern:
+    dateformat: yy-MM-dd HH:mm:ss.SSS
+  file:
+    path: "logs/${spring.application.name}"
+
+# 密钥校验配置
+shop:
+  jwt:
+    location: classpath:key.jks
+    alias: ikun
+    password: ikun-shop-123456
+  auth:
+    # 无需校验身份的路径
+    excludePaths:
+      - /**/login
+      - /**/register
+      - /oauth/**
+      - /**/health
+      - /commodity/home

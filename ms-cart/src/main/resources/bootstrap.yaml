@@ -1,11 +1,6 @@
 spring:
   application:
     name: cart
-  main:
-    banner-mode: off
-  output:
-    ansi:
-      enabled: always
   cloud:
     nacos:
       server-addr: localhost:8848

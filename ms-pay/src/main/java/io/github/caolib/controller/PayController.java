@@ -48,7 +48,6 @@ public class PayController {
 
     /**
      * 使用用户余额支付
-     * FIXME
      * @param id  支付单记录id
      * @param dto 支付订单表单数据传输对象
      */
@@ -71,11 +70,11 @@ public class PayController {
 
     /**
      * 取消支付单
-     * @param payOrderId 支付单id
+     * @param orderId 支付单id
      */
-    @PutMapping("/{payOrderId}")
-    public void cancelPayOrder(@PathVariable Long payOrderId) {
-        payOrderService.cancelPayOrder(payOrderId);
+    @PutMapping("/{orderId}")
+    public void cancelPayOrder(@PathVariable Long orderId) {
+        payOrderService.cancelPayOrder(orderId);
     }
 
 

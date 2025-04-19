@@ -71,7 +71,7 @@ public class CommodityController {
      */
     @GetMapping("{id}")
     public CommodityDTO queryItemById(@PathVariable("id") Long id) {
-        return BeanUtils.copyBean(commodityService.getById(id), CommodityDTO.class);
+        return BeanUtils.copyBean(commodityService.getCommodityById(id), CommodityDTO.class);
     }
 
     /**
