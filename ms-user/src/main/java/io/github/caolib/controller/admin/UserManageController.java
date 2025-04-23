@@ -62,7 +62,6 @@ public class UserManageController {
      */
     @PutMapping
     public void updateUser(@RequestBody UserDTO user) {
-        //log.debug("update user: {}", user);
         userService.updateUser(user);
     }
 

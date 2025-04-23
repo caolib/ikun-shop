@@ -98,6 +98,10 @@ public class CartController {
         cartService.removeBatchByIds(ids);
     }
 
+    /**
+     * 删除购物车条目
+     * @param userId 用户id
+     */
     @DeleteMapping("/cancel/{userId}")
     public R<Void> deleteCartByUserId(@PathVariable Long userId) {
         //log.debug("删除用户 {} 的购物车信息", userId);
