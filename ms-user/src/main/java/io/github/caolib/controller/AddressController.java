@@ -62,7 +62,6 @@ public class AddressController {
      */
     @PostMapping
     public R<Void> addAddress(@RequestBody @Validated AddressDTO addressDTO) {
-        //log.debug("添加地址: {}", addressDTO);
         return addressService.addAddress(UserContext.getUserId(), addressDTO);
     }
 

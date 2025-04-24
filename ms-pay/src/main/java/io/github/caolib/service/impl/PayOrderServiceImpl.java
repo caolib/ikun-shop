@@ -18,7 +18,6 @@ import io.github.caolib.domain.vo.PayStatisticVO;
 import io.github.caolib.enums.Code;
 import io.github.caolib.enums.E;
 import io.github.caolib.enums.PayStatus;
-import io.github.caolib.enums.Q;
 import io.github.caolib.exception.BizIllegalException;
 import io.github.caolib.mapper.PayOrderMapper;
 import io.github.caolib.service.IPayOrderService;
@@ -90,15 +89,15 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     @Override
     @GlobalTransactional
     public void payOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
+        //log.debug("开始支付...");
         String errorMsg = E.ORDER_STATUS_EXCEP;
 
         // 查询支付单
         PayOrder po = getById(payOrderFormDTO.getId());
-        log.debug("支付单查询结果：{}", po);
+        //log.debug("支付单查询结果：{}", po);
         // 判断状态
         if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
-            // 订单不是未支付
-            throw new BizIllegalException(errorMsg);
+            throw new BizIllegalException(errorMsg);// 订单不是未支付
         }
         // RPC --> 扣减用户余额
         R<String> res = userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount(), UserContext.getUserId());
@@ -109,18 +108,12 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
         // 修改支付单状态
         boolean success = markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now());
-        if (!success) {
-            throw new BizIllegalException(errorMsg);
-        }
+        if (!success) throw new BizIllegalException(errorMsg);
 
-        // MQ --> 修改订单状态为支付成功
+
+        // RPC --> 修改订单状态为支付成功
         Long orderId = po.getBizOrderNo();
-        try {
-            rabbitTemplate.convertAndSend(Q.PAY_EXCHANGE, Q.PAY_SUCCESS_KEY, orderId);
-            log.debug("<修改订单状态消息发送 --> MQ orderId:{}>", orderId);
-        } catch (Exception e) {
-            log.error("修改订单状态消息发送 --> MQ 失败，orderId:{}", orderId);
-        }
+        orderClient.markOrderPaySuccess(orderId);
     }
 
 

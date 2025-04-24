@@ -51,9 +51,8 @@ public class PayController {
      * @param id  支付单记录id
      * @param dto 支付订单表单数据传输对象
      */
-    @PostMapping("/{id}")
-    public R<Void> tryPayOrderByBalance(@PathVariable Long id, @RequestBody PayOrderFormDTO dto) {
-        dto.setId(id);
+    @PostMapping("/pay")
+    public R<Void> tryPayOrderByBalance(@RequestBody PayOrderFormDTO dto) {
         payOrderService.payOrderByBalance(dto);
         return R.ok();
     }

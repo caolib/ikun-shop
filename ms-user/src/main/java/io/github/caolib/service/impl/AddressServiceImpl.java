@@ -60,13 +60,13 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         // 查询用户地址个数
         long count = count(new LambdaQueryWrapper<Address>().eq(Address::getUserId, userId));
         // 如果地址数量已达上限，抛出异常
-        if (count >= addrProperties.getMaxCount()) {
-            throw new BadRequestException(Code.ADDR_ALREADY_MAX);
-        }
+        if (count >= addrProperties.getMaxCount()) throw new BadRequestException(Code.ADDR_ALREADY_MAX);
+        // id置为空
+        addressDTO.setId(null);
         // 转换为po
         Address address = BeanUtils.copyBean(addressDTO, Address.class);
-        // 如果是第一个地址，设置为默认地址
-        if (count == 0) address.setIsDefault(1);
+        // 如果是第一个地址，设置为默认地址,否则设置为非默认地址
+        address.setIsDefault(count == 0 ? 1 : 0);
         // 设置用户id
         address.setUserId(userId);
         // 保存
