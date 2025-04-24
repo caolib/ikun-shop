@@ -18,7 +18,6 @@ import io.github.caolib.domain.query.OrderQuery;
 import io.github.caolib.domain.vo.OrderDetailVO;
 import io.github.caolib.domain.vo.OrderVO2;
 import io.github.caolib.domain.vo.PayDetailVO;
-import io.github.caolib.domain.vo.PayOrderVO;
 import io.github.caolib.enums.E;
 import io.github.caolib.enums.OrderStatus;
 import io.github.caolib.enums.Q;
@@ -118,24 +117,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 查询订单
         Order order = getById(orderId);
         if (order == null) throw new BadRequestException(E.ORDER_NOT_EXIST);
-        // 查询支付单
-        PayOrderVO payOrderVO = payClient.getPayOrderByOrderId(orderId);
-        // 查询支付单状态
-        switch (payOrderVO.getStatus()) {
-            case 0:
-                return R.error("支付单未提交");
-            case 2:
-                return R.error("支付单已超时或取消");
-            case 3:
-                return R.error("支付单已支付");
-            default:
-                break;
-        }
-
-        order.setId(orderId);
         order.setStatus(OrderStatus.SUCCESS.getCode());
         order.setPayTime(LocalDateTime.now());
         updateById(order);
+        log.debug("订单 {} 支付成功", orderId);
 
         return R.ok("支付成功");
     }
