@@ -3,7 +3,6 @@ spring:
     name: gateway
   cloud:
     nacos:
-      server-addr: centos:8848
       config:
         shared-configs:
           - data-id: gateway.yaml

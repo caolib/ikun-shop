@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.caolib</groupId>
         <artifactId>ikun-shop</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>ms-commodity</artifactId>
@@ -22,13 +22,13 @@
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>feign-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.11-SNAPSHOT</version>
         </dependency>
         <!--公共依赖-->
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>utils</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.11-SNAPSHOT</version>
         </dependency>
         <!--web-->
         <dependency>

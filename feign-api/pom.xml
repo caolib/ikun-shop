@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.caolib</groupId>
         <artifactId>ikun-shop</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>feign-api</artifactId>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>utils</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.11-SNAPSHOT</version>
         </dependency>
         <!--负载均衡器-->
         <dependency>
