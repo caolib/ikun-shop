@@ -17,7 +17,7 @@ categories:
     labels:
       - "chore"
       - "dependencies"
-change-template: "- [$SHORT_SHA] $TITLE"
+change-template: "- $SHORT_SHA $TITLE"
 change-title-escapes: '\<*_&' # You can add # and @ to disable linking URLs and issues/users globally.
 template: |
   ## Changes
