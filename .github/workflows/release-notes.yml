@@ -1,0 +1,40 @@
+name: Generate Release Notes
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # 或者您使用的标签格式
+
+permissions:
+  contents: write # 需要写入权限来创建 Release
+
+jobs:
+  build_changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # 获取所有历史记录，以便比较标签之间的提交
+          fetch-depth: 0
+
+      - name: Build Changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          # 可以指定从哪个标签开始，留空会自动查找上一个标签
+          # fromTag: ${{ env.PREVIOUS_TAG }} 
+          toTag: ${{ github.ref_name }} # 当前触发工作流的标签
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: ${{ steps.build_changelog.outputs.changelog }} # 使用上一步生成的日志
+          draft: false # 直接发布
+          prerelease: false 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
