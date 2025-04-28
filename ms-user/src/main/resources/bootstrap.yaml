@@ -3,7 +3,6 @@ spring:
     name: user
   cloud:
     nacos:
-      server-addr: centos:8848
       config:
         # 拓展配置
         extension-configs:

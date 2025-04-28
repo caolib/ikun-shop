@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.caolib</groupId>
         <artifactId>ikun-shop</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.13-SNAPSHOT</version>
     </parent>
 
     <artifactId>gateway</artifactId>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>io.github.caolib</groupId>
             <artifactId>utils</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.13-SNAPSHOT</version>
             <!--排除依赖-->
             <exclusions>
                 <exclusion>

@@ -6,7 +6,7 @@
 
     <groupId>io.github.caolib</groupId>
     <artifactId>ikun-shop</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -111,6 +111,31 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <!-- versions-maven-plugin 配置 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.16.2</version>
+                <executions>
+                    <execution>
+                        <id>update-snapshot-before-deploy</id>
+                        <!-- 绑定到 install 阶段 -->
+                        <phase>install</phase>
+                        <goals>
+                            <goal>set</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <!-- 设置要执行的参数 -->
+                            <nextSnapshot>true</nextSnapshot>
+                            <generateBackupPoms>false</generateBackupPoms>
+                            <processAllModules>false</processAllModules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <developers>
@@ -127,13 +152,10 @@
     </developers>
 
     <distributionManagement>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/caolib/ikun-shop</url>
-        </repository>
         <snapshotRepository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/caolib/ikun-shop</url>
+            <id>caolib</id> <!-- 这个 ID 需要与 settings.xml 中 server 的 ID 匹配 -->
+            <name>bocchi</name>
+            <url>https://packages.aliyun.com/680a2436ed55cebcb8770148/maven/caolib</url> <!-- 您的云效 Snapshot 仓库 URL -->
         </snapshotRepository>
     </distributionManagement>
 

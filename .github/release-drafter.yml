@@ -1,0 +1,25 @@
+name-template: "v$NEXT_PATCH_VERSION"
+tag-template: "v$NEXT_PATCH_VERSION"
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "feature"
+      - "enhancement"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "fix"
+      - "bugfix"
+      - "bug"
+  - title: "📝 Documentation"
+    labels:
+      - "documentation"
+  - title: "🏠 Maintenance"
+    labels:
+      - "chore"
+      - "dependencies"
+change-template: "- [$SHORT_SHA] $TITLE"
+change-title-escapes: '\<*_&' # You can add # and @ to disable linking URLs and issues/users globally.
+template: |
+  ## Changes
+
+  $CHANGES

@@ -3,7 +3,6 @@ spring:
     name: cart
   cloud:
     nacos:
-      server-addr: centos:8848
       config:
         shared-configs:
           - data-id: common.yaml

@@ -3,7 +3,6 @@ spring:
     name: order
   cloud:
     nacos:
-      server-addr: centos:8848
       config:
         # 共享配置
         shared-configs:
