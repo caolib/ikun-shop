@@ -1,5 +1,5 @@
-name-template: "v$NEXT_PATCH_VERSION"
-tag-template: "v$NEXT_PATCH_VERSION"
+name-template: "v$TAG"
+tag-template: "v$TAG"
 categories:
   - title: "🚀 Features"
     labels:
@@ -17,7 +17,7 @@ categories:
     labels:
       - "chore"
       - "dependencies"
-change-template: "- $SHORT_SHA $TITLE"
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&' # You can add # and @ to disable linking URLs and issues/users globally.
 template: |
   ## Changes
